@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>C++继承</title>
+      <link href="/2024/01/30/C-%E7%BB%A7%E6%89%BF/"/>
+      <url>/2024/01/30/C-%E7%BB%A7%E6%89%BF/</url>
+      
+        <content type="html"><![CDATA[<h1 id="C-继承"><a href="#C-继承" class="headerlink" title="C++继承"></a>C++继承</h1><p>本节介绍C++的继承和多态的语法</p><h2 id="继承方法"><a href="#继承方法" class="headerlink" title="继承方法"></a>继承方法</h2><p>一图解</p><p><img src="/Images/20200221123718539.png" alt="20200221123718539"></p><h2 id="继承中的对象模型"><a href="#继承中的对象模型" class="headerlink" title="继承中的对象模型"></a>继承中的对象模型</h2><p>一句话，在继承中，父类的私有成员只是被隐藏了，占存储空间，还是会被继承下去。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="type">int</span> a;</span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line"><span class="type">int</span> b;</span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line"><span class="type">int</span> c;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Son</span>: <span class="keyword">public</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="type">int</span> d;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">std::cout&lt;&lt;<span class="built_in">sizeof</span>(Son)&lt;&lt;endl;</span><br><span class="line"><span class="comment">//输出16 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="构造和析构的顺序"><a href="#构造和析构的顺序" class="headerlink" title="构造和析构的顺序"></a>构造和析构的顺序</h2><p>构造和析构的顺序，先构造父类，再构造子类；先析构子类，最后再析构父类</p><h2 id="同名成员处理"><a href="#同名成员处理" class="headerlink" title="同名成员处理"></a>同名成员处理</h2><p>当子类和父类出现同名的成员时：</p><p>若访问子类同名成员，直接访问即可；若访问父类同名成员，需要加作用域。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">Base</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="built_in">Base</span>()&#123;</span><br><span class="line">a=<span class="number">100</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> a;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Son</span>: <span class="keyword">public</span> Base&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="built_in">Son</span>()&#123;</span><br><span class="line">a=<span class="number">200</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">int</span> a;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">Son s;</span><br><span class="line">std::cout&lt;&lt;s.a&lt;&lt;endl;</span><br><span class="line"><span class="comment">//输出200</span></span><br><span class="line">std::cout&lt;&lt;s.Base::a&lt;&lt;endl;</span><br><span class="line"><span class="comment">//输出100 </span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>子父类同名函数调用也是同理，但需要注意的是：</p><p>当子类中出现与父类同名的成员函数时，子类的同名成员会隐藏掉父类中所有的同名成员函数（各种重载函数），如果想访问到父类中被隐藏的同名成员函数，需要加作用域（作用域原理同同名成员变量）</p><h2 id="同名静态成员处理方式"><a href="#同名静态成员处理方式" class="headerlink" title="同名静态成员处理方式"></a>同名静态成员处理方式</h2><p>静态成员和非静态成员出现同名，处理方式一致</p><p>若访问子类同名成员，直接访问即可；若访问父类同名成员，需要加作用域。</p><p>静态成员能够通过类名访问，详细语法在之前的CPP类的基础中的静态成员已经提及过，—–&gt;<a href="https://www.beihaihaihai.top/2024/01/29/cpp%E7%B1%BB%E5%9F%BA%E7%A1%80/">传送门</a></p><p>(类名: :成员名，来访问静态成员)</p><h2 id="多继承语法"><a href="#多继承语法" class="headerlink" title="多继承语法"></a>多继承语法</h2><p>C++允许一个类继承多个类</p><p>语法：</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> 子类 : 继承方式 父类<span class="number">1</span> , 继承方式 父类<span class="number">2</span> ...</span><br></pre></td></tr></table></figure><p>多继承可能会引发父类中有同名成员出现，需要加作用域区分</p><p>（C++实际开发中不建议使用多继承）</p><p>总而言之，多继承中如果父类中出现了同名情况，子类使用时候要加作用域加以区分</p><h2 id="菱形继承"><a href="#菱形继承" class="headerlink" title="菱形继承"></a>菱形继承</h2><h3 id="菱形继承概念"><a href="#菱形继承概念" class="headerlink" title="菱形继承概念"></a>菱形继承概念</h3><p>两个派生类继承同一个基类，某个类同时继承这两个派生类，这种继承称为菱形继承，又称钻石继承。</p><h3 id="菱形继承问题"><a href="#菱形继承问题" class="headerlink" title="菱形继承问题"></a>菱形继承问题</h3><p><img src="/Images/1706619988650.jpg" alt="1706619988650"></p><p>举个例子：</p><p>在这张图里面，羊继承了动物的数据，同意驼也继承了一份同样的数据，当羊驼使用数据时，就会产生二义性，解决这个问题的关键在于羊驼取动物的数据时，只从羊或者驼中之一取一份。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="type">int</span> age;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> :<span class="keyword">public</span> A&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> :<span class="keyword">public</span> A&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Bc</span> :<span class="keyword">public</span> B, <span class="keyword">public</span> C&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">Bc s;</span><br><span class="line">s.B::age=<span class="number">18</span>;</span><br><span class="line">s.C::age=<span class="number">28</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>观察这个代码，虽然可以通过多继承的作用域加以区分，两个父类相同的数据，但是这样会在实际开发中产生歧义，浪费存储空间，如例子中的羊驼（Bc）的年龄是继承18还是28呢？</p><p>实际上，也应该是，这份数据，我们只要有一份就可以。</p><h3 id="解决菱形继承"><a href="#解决菱形继承" class="headerlink" title="解决菱形继承"></a>解决菱形继承</h3><p>利用虚继承，解决菱形继承的问题</p><p>继承之前加上关键字virtual，变为虚继承</p><p>在这个例子中，A类称为 虚基类</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">A</span>&#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line"><span class="type">int</span> age;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">B</span> :<span class="keyword">virtual</span> <span class="keyword">public</span> A&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">C</span> :<span class="keyword">virtual</span> <span class="keyword">public</span> A&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Bc</span> :<span class="keyword">public</span> B, <span class="keyword">public</span> C&#123;</span><br><span class="line"></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">test</span><span class="params">()</span></span>&#123;</span><br><span class="line">Bc s;</span><br><span class="line">s.B::age=<span class="number">18</span>;</span><br><span class="line">s.C::age=<span class="number">28</span>;</span><br><span class="line">s.age=<span class="number">38</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>应用虚继承后，age只有一份。在上面代码的例子中，age先后被赋值为18，28，最后再被改为38，数据只有一份。虚基础是怎么实现只继承一份数据的？其实是用了虚基类指针和虚基类表</p><h3 id="虚基础原理"><a href="#虚基础原理" class="headerlink" title="虚基础原理"></a>虚基础原理</h3><p><img src="/Images/3c6066e66608a29a50657a7cffc0d26.png" alt="3c6066e66608a29a50657a7cffc0d26"></p><p>在这张表中，ST从S和T类中继承了vbptr（virtual base pointer）虚基类指针，然后只有一份从虚基类（A）继承的值age。</p><p><img src="/Images/c38ffa6b96452d3575201a5b78f25a4.png" alt="c38ffa6b96452d3575201a5b78f25a4"></p><p>vbptr指向vbtable（虚基类表），在这个例子中S的vbptr指向的vbtable里的偏移量为8，从vbptr地址处偏移8就能取到age的值，同理，T的vbptr指向的vbtable里的偏移量为4，从该vbptr地址处偏移4就同样能取到age的值，age的值唯一且是共享。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 基础 </tag>
+            
+            <tag> C++ </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>GeekChallenge 2023 re wp</title>
       <link href="/2024/01/29/GeekChallenge/"/>
       <url>/2024/01/29/GeekChallenge/</url>
@@ -20,9 +47,9 @@
       
         <tags>
             
-            <tag> 逆向 </tag>
-            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
         </tags>
       
@@ -47,9 +74,9 @@
       
         <tags>
             
-            <tag> 逆向 </tag>
-            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
         </tags>
       
@@ -88,9 +115,9 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -104,6 +131,28 @@
       <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>游戏</title>
+      <link href="/games/index.html"/>
+      <url>/games/index.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
       
     </entry>
     
@@ -132,22 +181,11 @@
     
     
     <entry>
-      <title>游戏</title>
-      <link href="/games/index.html"/>
-      <url>/games/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
       
     </entry>
     
@@ -165,17 +203,6 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
-      
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
@@ -187,9 +214,9 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -198,9 +225,9 @@
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
