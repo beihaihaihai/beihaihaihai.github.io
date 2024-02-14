@@ -4,6 +4,33 @@
   
     
     <entry>
+      <title>hgame_week2</title>
+      <link href="/2024/02/14/hagme-week2/"/>
+      <url>/2024/02/14/hagme-week2/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-babyre"><a href="#0x01-babyre" class="headerlink" title="0x01 babyre"></a>0x01 babyre</h2><p>这个程序的关键在于几个线程的调用，和key的值。</p><p>首先key 的值在主函数的异或前是先赋值过的，不是原本静态存储的那个值，可以通过动调得到</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">0x77, 0x74, 0x78, 0x66, 0x65, 0x69</span><br></pre></td></tr></table></figure><p>然后关于这个线程的调用我也不是很懂，大概就是创建四个线程，每个线程里存有各自的函数的地址，然后按顺序依次调用，调用了一个线程后该线程对应的信号量减一（wait），下一个线程的信号量加一（post），这时就调用下一个线程的函数，依次循环，直到全局变量 i 为31停止，最后退出线程，四个线程总共循环8次（按理来说，因为flag是32位，全部加密一轮需要8*4&#x3D;32次），按照这个思路写出逆向脚本，结果也是没问题的。</p><p>一开始做题的时候是通过调试发现四个线程一轮只调用一次，于是猜测是逐个逐个进行。</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string.h&gt;</span></span></span><br><span class="line">__int32 enc[<span class="number">33</span>] = &#123;<span class="number">12052</span>,<span class="number">78</span>,<span class="number">20467</span>,<span class="number">109</span>,<span class="number">13016</span>,<span class="number">109</span>,<span class="number">27467</span>,<span class="number">-110</span>,</span><br><span class="line">        <span class="number">9807</span>,<span class="number">91</span>,<span class="number">21243</span>,<span class="number">-100</span>,<span class="number">11121</span>,<span class="number">20</span>,<span class="number">10863</span>,<span class="number">-107</span>,<span class="number">10490</span>,<span class="number">29</span>,<span class="number">10633</span>,<span class="number">-101</span>,</span><br><span class="line">        <span class="number">10420</span>,<span class="number">78</span>,<span class="number">17670</span>,<span class="number">-38</span>,<span class="number">6011</span>,<span class="number">-4</span>,<span class="number">16590</span>,<span class="number">125</span>,<span class="number">10723</span>,</span><br><span class="line">        <span class="number">15</span>,<span class="number">7953</span>,<span class="number">255</span> , <span class="number">250</span>&#125;;</span><br><span class="line">__int32 key[<span class="number">6</span>] = &#123;<span class="number">0x77</span>, <span class="number">0x74</span>, <span class="number">0x78</span>, <span class="number">0x66</span>, <span class="number">0x65</span>, <span class="number">0x69</span>&#125;;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span>&#123;</span><br><span class="line"><span class="type">int</span> i = <span class="number">31</span>;</span><br><span class="line">    <span class="keyword">while</span>(i &gt;= <span class="number">0</span>)&#123;</span><br><span class="line">        enc[i] ^= (enc[i + <span class="number">1</span>] - key[(i + <span class="number">1</span>) % <span class="number">6</span>]);</span><br><span class="line">        i--;</span><br><span class="line">        enc[i] /= (enc[i + <span class="number">1</span>] + key[(i + <span class="number">1</span>) % <span class="number">6</span>]);</span><br><span class="line">        i--;</span><br><span class="line">        enc[i] += (key[(i + <span class="number">1</span>) % <span class="number">6</span>] ^ enc[i + <span class="number">1</span>]);</span><br><span class="line">        i--;</span><br><span class="line">        enc[i] -= (key[(i + <span class="number">1</span>) % <span class="number">6</span>] * enc[i + <span class="number">1</span>]);</span><br><span class="line">        i--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">32</span>;j++)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>,enc[j]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>hgame{you_are_3o_c1ever2_3Olve!}</p><h2 id="0x02-ezcpp"><a href="#0x02-ezcpp" class="headerlink" title="0x02 ezcpp"></a>0x02 ezcpp</h2><p>一进去看了一眼就是TEA加密，不过这个TEA加密和普通的不太一样，他是依次分别取input（char类型）（用户输入值）的下标为0和4,1和5,2和6,3和7的首地址，然依此地址为最低位，向后取3个char值和自己本身拼合成32位的int数，比如0x11,0x22，0x33，0x44，就以小端序存储成0x44332211。</p><p>在这个加密里，取flag[0]的地址解引用，然后传入某个变量v，其实就是将flag0,1,2,3 的值以上述方式拼合成int类型然后传入变量v，知道这个后，其实不难发现该加密只加密了前11个字符（因为以flag[7]的地址加密，最多拼合7到10，总共4个字符成int，也就是最多加密到flag[10]也就是第11的字符）</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="comment">//密文flag</span></span><br><span class="line"><span class="type">int</span> flag[<span class="number">32</span>] = &#123;<span class="number">0x88</span>, <span class="number">0x6A</span>, <span class="number">0xB0</span>, <span class="number">0xC9</span>, <span class="number">0xAD</span>, <span class="number">0xF1</span>, <span class="number">0x33</span>, <span class="number">0x33</span>, <span class="number">0x94</span>, <span class="number">0x74</span>, </span><br><span class="line">                <span class="number">0xB5</span>, <span class="number">0x69</span>, <span class="number">0x73</span>, <span class="number">0x5F</span>, <span class="number">0x30</span>, <span class="number">0x62</span>, <span class="number">0x4A</span>, <span class="number">0x33</span>, <span class="number">0x63</span>, <span class="number">0x54</span>, </span><br><span class="line">                <span class="number">0x5F</span>, <span class="number">0x30</span>, <span class="number">0x72</span>, <span class="number">0x31</span>, <span class="number">0x65</span>, <span class="number">0x6E</span>, <span class="number">0x54</span>, <span class="number">0x65</span>, <span class="number">0x44</span>, <span class="number">0x3F</span>, </span><br><span class="line">                <span class="number">0x21</span>, <span class="number">0x7D</span>&#125;;</span><br><span class="line"><span class="type">int</span> v20,v21,v18,v19,v10,v9,v5,v6,sum,delta;</span><br><span class="line"><span class="comment">//四个密钥</span></span><br><span class="line"><span class="type">int</span> key1 = <span class="number">2341</span>, key2 = <span class="number">1234</span>, key3 = <span class="number">4123</span>, key4 = <span class="number">3412</span>;</span><br><span class="line"><span class="comment">//将int类型拆分成字符的函数</span></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">trans</span><span class="params">(<span class="type">int</span> v,<span class="type">int</span> i)</span></span>&#123;</span><br><span class="line">    flag[i] = v &amp; <span class="number">0xff</span>;</span><br><span class="line">    flag[i+<span class="number">1</span>] = (v&gt;&gt;<span class="number">8</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">    flag[i+<span class="number">2</span>] = (v&gt;&gt;<span class="number">16</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">    flag[i+<span class="number">3</span>] = (v&gt;&gt;<span class="number">24</span>) &amp; <span class="number">0xff</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="comment">//按照原加密的顺序逆过来</span></span><br><span class="line">    delta = <span class="number">-559038737</span>;</span><br><span class="line">    <span class="comment">//first</span></span><br><span class="line">    sum = delta * <span class="number">32</span>;</span><br><span class="line">    <span class="comment">//将字符拼合成int的整数</span></span><br><span class="line">    v20 = flag[<span class="number">3</span>]|(flag[<span class="number">4</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">5</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">6</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    v21 = flag[<span class="number">7</span>]|(flag[<span class="number">8</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">9</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">10</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    <span class="comment">//TEA加密的部分</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; <span class="number">32</span>;i++)&#123;</span><br><span class="line">        v21 -= (sum + v20) ^ (key3 + <span class="number">32</span> * v20) ^ (key4 + <span class="number">16</span> * v20);</span><br><span class="line">        v20 -= (sum + v21) ^ (key1 + <span class="number">32</span> * v21) ^ (key2 + <span class="number">16</span> * v21);</span><br><span class="line">        sum -= delta;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//调用函数将int拆分成原来的字符</span></span><br><span class="line">    <span class="built_in">trans</span>(v20,<span class="number">3</span>);</span><br><span class="line">    <span class="built_in">trans</span>(v21,<span class="number">7</span>);</span><br><span class="line">    <span class="comment">//second</span></span><br><span class="line">    sum = delta * <span class="number">32</span>;</span><br><span class="line">    v18 = flag[<span class="number">2</span>]|(flag[<span class="number">3</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">4</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">5</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    v19 = flag[<span class="number">6</span>]|(flag[<span class="number">7</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">8</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">9</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; <span class="number">32</span>;i++)&#123;</span><br><span class="line">        v19 -= (sum + v18) ^ (key3 + <span class="number">32</span> * v18) ^ (key4 + <span class="number">16</span> * v18);</span><br><span class="line">        v18 -= (sum + v19) ^ (key1 + <span class="number">32</span> * v19) ^ (key2 + <span class="number">16</span> * v19);  </span><br><span class="line">        sum -= delta;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">trans</span>(v18,<span class="number">2</span>);</span><br><span class="line">    <span class="built_in">trans</span>(v19,<span class="number">6</span>);</span><br><span class="line">    <span class="comment">//third</span></span><br><span class="line">    sum = delta * <span class="number">32</span>;</span><br><span class="line">    v9 = flag[<span class="number">1</span>]|(flag[<span class="number">2</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">3</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">4</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    v10 = flag[<span class="number">5</span>]|(flag[<span class="number">6</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">7</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">8</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; <span class="number">32</span>;i++)&#123;</span><br><span class="line">        v10 -= (sum + v9) ^ (key3 + <span class="number">32</span> * v9) ^ (key4 + <span class="number">16</span> * v9);</span><br><span class="line">        v9 -= (sum + v10) ^ (key1 + <span class="number">32</span> * v10) ^ (key2 + <span class="number">16</span> * v10);</span><br><span class="line">        sum -= delta;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">trans</span>(v9,<span class="number">1</span>);</span><br><span class="line">    <span class="built_in">trans</span>(v10,<span class="number">5</span>);</span><br><span class="line">    <span class="comment">//forth</span></span><br><span class="line">    sum = delta * <span class="number">32</span>;</span><br><span class="line">    v5 = flag[<span class="number">0</span>]|(flag[<span class="number">1</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">2</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">3</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    v6 = flag[<span class="number">4</span>]|(flag[<span class="number">5</span>]&lt;&lt;<span class="number">8</span>)|(flag[<span class="number">6</span>]&lt;&lt;<span class="number">16</span>)|(flag[<span class="number">7</span>]&lt;&lt;<span class="number">24</span>);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; <span class="number">32</span>;i++)&#123;</span><br><span class="line">        v6 -= (sum + v5) ^ (<span class="number">16</span> * v5 + key4) ^ (<span class="number">32</span> * v5 + key3);</span><br><span class="line">        v5 -= (sum + v6) ^ (<span class="number">16</span> * v6 + key2) ^ (<span class="number">32</span> * v6 + key1);</span><br><span class="line">        sum -= delta;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">trans</span>(v5,<span class="number">0</span>);</span><br><span class="line">    <span class="built_in">trans</span>(v6,<span class="number">4</span>);</span><br><span class="line">    <span class="comment">//print</span></span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>;i &lt; <span class="number">32</span>;i++)&#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%c&quot;</span>,flag[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>hgame</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Re-wp </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>C++类模板</title>
       <link href="/2024/02/08/%E7%B1%BB%E6%A8%A1%E6%9D%BF/"/>
       <url>/2024/02/08/%E7%B1%BB%E6%A8%A1%E6%9D%BF/</url>
@@ -223,17 +250,6 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title></title>
       <link href="/css/custom.css"/>
       <url>/css/custom.css</url>
@@ -256,50 +272,6 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/universe.css"/>
-      <url>/css/universe.css</url>
-      
-        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>游戏</title>
-      <link href="/games/index.html"/>
-      <url>/games/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/runtime.js"/>
-      <url>/js/runtime.js</url>
-      
-        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
-      
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>友链</title>
       <link href="/link/index.html"/>
       <url>/link/index.html</url>
@@ -311,11 +283,33 @@
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title></title>
+      <link href="/css/universe.css"/>
+      <url>/css/universe.css</url>
+      
+        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>游戏</title>
+      <link href="/games/index.html"/>
+      <url>/games/index.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
       
     </entry>
     
@@ -338,6 +332,39 @@
       <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/runtime.js"/>
+      <url>/js/runtime.js</url>
+      
+        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
+      
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
       
     </entry>
     
