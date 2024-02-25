@@ -62,6 +62,37 @@
     
     
     <entry>
+      <title>线段树转载记录</title>
+      <link href="/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/"/>
+      <url>/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/</url>
+      
+        <content type="html"><![CDATA[<p><a href="https://zhuanlan.zhihu.com/p/106118909">原文章（线段树）</a></p><h2 id="0x01-种一颗线段树"><a href="#0x01-种一颗线段树" class="headerlink" title="0x01 种一颗线段树"></a>0x01 种一颗线段树</h2><p>假如我现在有一个数组A，总共有n个元素，我既想实现区间修改，又想单个修改，这时候种一颗线段树来维护这个数组，能平衡收益。</p><h2 id="0x02-怎么建立？"><a href="#0x02-怎么建立？" class="headerlink" title="0x02 怎么建立？"></a>0x02 怎么建立？</h2><p>线段树是一颗平衡二叉树，双亲结点是区间的和，左右子节点是双亲区间分两半的区间</p><img src="../../..//Images/image-20240224211506204.png" alt="image-20240224211506204" style="zoom: 50%;" /><p>每个节点 p 的左右子节点的编号分别为 2p 和 2p+1，假设 双亲结点p 的为区间 [l , r]的和。</p><p>设 mid &#x3D; [(l + r)&#x2F;2]，那么两个子节点分别存储[l , mid] 和 [mid+1 , r]的和。可以发现，左节点对应的区间长度，与右节点相同或者比之恰好多1。</p><p>知道这些后，便可以用递归的方法来种一颗线段树了。大体的思想就是，从叶子结点开始，从下往上逐步建立。这便是递归的思想</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">build</span><span class="params">(elem l = <span class="number">1</span>, elem r = n, elem p = <span class="number">1</span>)</span></span>&#123;</span><br><span class="line"><span class="comment">// 到达叶子节点</span></span><br><span class="line">    <span class="keyword">if</span> (l == r)&#123; </span><br><span class="line">    <span class="comment">// 到达叶子节点</span></span><br><span class="line">        tree[p] = A[l];</span><br><span class="line">        <span class="comment">// 用数组中的数据赋值</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span>&#123;</span><br><span class="line">        elem mid = (l + r) / <span class="number">2</span>;</span><br><span class="line">        <span class="built_in">build</span>(l, mid, p * <span class="number">2</span>); </span><br><span class="line">        <span class="comment">// 先建立左右子节点</span></span><br><span class="line">        <span class="built_in">build</span>(mid + <span class="number">1</span>, r, p * <span class="number">2</span> + <span class="number">1</span>);</span><br><span class="line">        tree[p] = tree[p * <span class="number">2</span>] + tree[p * <span class="number">2</span> + <span class="number">1</span>]; </span><br><span class="line">        <span class="comment">// 该节点的值等于左右子节点之和</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="0x03-修改维护"><a href="#0x03-修改维护" class="headerlink" title="0x03 修改维护"></a>0x03 修改维护</h2><p>在讲区间修改前，要先引入一个 “<strong>懒标记</strong>”（lazy） 的概念。懒标记是线段树的精髓所在。对于区间修改，朴素的想法是用<strong>递归</strong>的方式一层层修改（类似于线段树的建立），但这样的时间复杂度比较高。使用懒标记后，对于那些正好是线段树节点的区间，我们不继续递归下去，而是打上一个<strong>标记</strong>，将来要用到它的<strong>子区间</strong>的时候，再向下<strong>传递</strong>。</p><p>给目标区间[l , r]加上数d。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">update</span><span class="params">(ll l, ll r, ll d, ll p = <span class="number">1</span>, ll cl = <span class="number">1</span>, ll cr = n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (cl &gt; r || cr &lt; l) <span class="comment">// 区间无交集</span></span><br><span class="line">        <span class="keyword">return</span>; <span class="comment">// 剪枝</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (cl &gt;= l &amp;&amp; cr &lt;= r) <span class="comment">// 当前节点对应的区间包含在目标区间中</span></span><br><span class="line">    &#123;</span><br><span class="line">        tree[p] += (cr - cl + <span class="number">1</span>) * d; <span class="comment">// 更新当前区间的值</span></span><br><span class="line">        <span class="keyword">if</span> (cr &gt; cl) <span class="comment">// 如果不是叶子节点</span></span><br><span class="line">            mark[p] += d; <span class="comment">// 给当前区间打上标记</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="comment">// 与目标区间有交集，但不包含于其中</span></span><br><span class="line">    &#123;</span><br><span class="line">        ll mid = (cl + cr) / <span class="number">2</span>;</span><br><span class="line">        mark[p * <span class="number">2</span>] += mark[p]; <span class="comment">// 标记向下传递</span></span><br><span class="line">        mark[p * <span class="number">2</span> + <span class="number">1</span>] += mark[p];</span><br><span class="line">        tree[p * <span class="number">2</span>] += mark[p] * (mid - cl + <span class="number">1</span>); <span class="comment">// 往下更新一层</span></span><br><span class="line">        tree[p * <span class="number">2</span> + <span class="number">1</span>] += mark[p] * (cr - mid);</span><br><span class="line">        mark[p] = <span class="number">0</span>; <span class="comment">// 清除标记</span></span><br><span class="line">        <span class="built_in">update</span>(l, r, d, p * <span class="number">2</span>, cl, mid); <span class="comment">// 递归地往下寻找</span></span><br><span class="line">        <span class="built_in">update</span>(l, r, d, p * <span class="number">2</span> + <span class="number">1</span>, mid + <span class="number">1</span>, cr);</span><br><span class="line">        tree[p] = tree[p * <span class="number">2</span>] + tree[p * <span class="number">2</span> + <span class="number">1</span>]; <span class="comment">// 根据子节点更新当前节点的值</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>分三种情况处理，当前结点p的区间[cl , rl]，与目标区间无交集，包含关系，有交集。</p><p>用懒标记来给维护区间的加减</p><h2 id="0x04-区间查询"><a href="#0x04-区间查询" class="headerlink" title="0x04 区间查询"></a>0x04 区间查询</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">ll <span class="title">query</span><span class="params">(ll l, ll r, ll p = <span class="number">1</span>, ll cl = <span class="number">1</span>, ll cr = n)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (cl &gt; r || cr &lt; l)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (cl &gt;= l &amp;&amp; cr &lt;= r)</span><br><span class="line">        <span class="keyword">return</span> tree[p];</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        ll mid = (cl + cr) / <span class="number">2</span>;</span><br><span class="line">        <span class="built_in">push_down</span>(p, cr - cl + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="built_in">query</span>(l, r, p * <span class="number">2</span>, cl, mid) + <span class="built_in">query</span>(l, r, p * <span class="number">2</span> + <span class="number">1</span>, mid + <span class="number">1</span>, cr); </span><br><span class="line">        <span class="comment">// 上一行拆成三行写就和区间修改格式一致了</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      <categories>
+          
+          <category> 数据结构 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 基础 </tag>
+            
+            <tag> C++ </tag>
+            
+            <tag> 算法 </tag>
+            
+            <tag> 数据结构 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>C++容器初识和string容器</title>
       <link href="/2024/02/19/c-%E5%AE%B9%E5%99%A8%E5%88%9D%E8%AF%86%E5%92%8Cstring%E5%AE%B9%E5%99%A8/"/>
       <url>/2024/02/19/c-%E5%AE%B9%E5%99%A8%E5%88%9D%E8%AF%86%E5%92%8Cstring%E5%AE%B9%E5%99%A8/</url>
@@ -389,33 +420,11 @@
     
     
     <entry>
-      <title>分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title></title>
       <link href="/css/universe.css"/>
       <url>/css/universe.css</url>
       
         <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
@@ -433,22 +442,44 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
+        <content type="html"><![CDATA[]]></content>
       
     </entry>
     
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
+      
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
       
     </entry>
     
@@ -477,6 +508,17 @@
     
     
     <entry>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
@@ -491,17 +533,6 @@
       <title>视频</title>
       <link href="/movies/index.html"/>
       <url>/movies/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
