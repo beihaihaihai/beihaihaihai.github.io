@@ -649,6 +649,17 @@
     
     
     <entry>
+      <title>游戏</title>
+      <link href="/games/index.html"/>
+      <url>/games/index.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title></title>
       <link href="/css/custom.css"/>
       <url>/css/custom.css</url>
@@ -682,17 +693,6 @@
     
     
     <entry>
-      <title>游戏</title>
-      <link href="/games/index.html"/>
-      <url>/games/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title></title>
       <link href="/js/runtime.js"/>
       <url>/js/runtime.js</url>
@@ -715,9 +715,9 @@
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -737,9 +737,9 @@
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -748,9 +748,9 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
