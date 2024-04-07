@@ -396,7 +396,7 @@
       <link href="/2024/02/14/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E5%A4%A7%E5%85%A8/"/>
       <url>/2024/02/14/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E5%A4%A7%E5%85%A8/</url>
       
-        <content type="html"><![CDATA[<h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><p>打算记录一些数学题目，发现不会编辑数学公式，遂记录。</p><p>编辑数学公式前，要将其囊括在首尾两个美元符号的大括号中。</p><h2 id="0x02-常用符号"><a href="#0x02-常用符号" class="headerlink" title="0x02 常用符号"></a>0x02 常用符号</h2><p>整合一些常用的符号例如古希腊字母，积分符号，求和符号等等。</p><h3 id="古希腊字母"><a href="#古希腊字母" class="headerlink" title="古希腊字母"></a>古希腊字母</h3><p><img src="/Images/image-20240402181057758.png" alt="image-20240402181057758"></p><h3 id="各种运算符号"><a href="#各种运算符号" class="headerlink" title="各种运算符号"></a>各种运算符号</h3><p><img src="/Images/image-20240402181435055.png" alt="image-20240402181435055"></p><h3 id="三角函数和对数"><a href="#三角函数和对数" class="headerlink" title="三角函数和对数"></a>三角函数和对数</h3><p>只需要在反斜杠后加上对应字母表示</p><p>补充一下圆周率是pi</p><h3 id="向量符号和根号等"><a href="#向量符号和根号等" class="headerlink" title="向量符号和根号等"></a>向量符号和根号等</h3><p><img src="/Images/image-20240402181724770.png" alt="image-20240402181724770"></p><h3 id="调整大小"><a href="#调整大小" class="headerlink" title="调整大小"></a>调整大小</h3><p>主要是math mode</p><p><img src="/Images/image-20240402181825954.png" alt="image-20240402181825954"></p><h2 id="0x03-基本编辑方法"><a href="#0x03-基本编辑方法" class="headerlink" title="0x03 基本编辑方法"></a>0x03 基本编辑方法</h2><p>记录一些数学公式编辑方法</p><h3 id="如何输入上下标"><a href="#如何输入上下标" class="headerlink" title="如何输入上下标"></a>如何输入上下标</h3><p><code>^</code> 表示上表，<code>_</code> 表示下标，如果上下标的内容多于一个字符，需要用 <code>&#123;&#125;</code>将这些内容括成一个整体</p><p>​                                                                $$${e{^x_y}=(x+2)^5}$$$</p><p>​                                                                 <script type="math/tex">{e{^x_y}=(x+2)^5}</script></p><h3 id="如何显示分数"><a href="#如何显示分数" class="headerlink" title="如何显示分数"></a>如何显示分数</h3><p>通常使用 <code>\frac &#123;分子&#125; &#123;分母&#125;</code> 来生成一个分数，分数可多层嵌套。如果分式较为复杂，亦可使用 <code>分子 \over 分母</code> 此时分数仅有一层</p><p>​                                                    $$${\frac{x+1}{y+1}=\frac xy}$$$</p><p>​                                                                    <script type="math/tex">{\frac{x+1}{y+1}=\frac xy}</script></p><p>或者使用<code>\frac ab</code>快速生成一个a/b</p><h3 id="如何输入省略号"><a href="#如何输入省略号" class="headerlink" title="如何输入省略号"></a>如何输入省略号</h3><p>数学公式中常见的省略号有两种，<code>\ldots</code> 表示与 <strong>文本底线</strong> 对齐的省略号，<code>\cdots</code> 表示与 <strong>文本中线</strong> 对齐的省略号</p><h3 id="如何输入积分"><a href="#如何输入积分" class="headerlink" title="如何输入积分"></a>如何输入积分</h3><p>使用 <code>\int_积分下限^积分上限 &#123;被积表达式&#125;</code> 来输入一个积分</p><p>​                                                    $$${\int{_1^2}{f^{-1}(x)dx}}$$$</p><p>​                                                                 <script type="math/tex">{\int{_1^2}{f^{-1}(x)dx}}</script></p><h3 id="如何输入极限"><a href="#如何输入极限" class="headerlink" title="如何输入极限"></a>如何输入极限</h3><p>使用 <code>\lim_&#123;变量 \to 表达式&#125; 表达式</code> 来输入一个极限。如有需求，可以更改 <code>\to</code> 符号至任意符号</p><p>​                                                $$${\lim_{x \to \infty}\frac{sinx}{x}}$$$</p><p>​                                                                  <script type="math/tex">{\lim_{x \to \infty}\frac{sinx}{x}}</script></p><h2 id="0x04-符号汇总"><a href="#0x04-符号汇总" class="headerlink" title="0x04 符号汇总"></a>0x04 符号汇总</h2><p><img src="/Images/2018041621294865.png" alt="2018041621294865"></p><p><img src="/Images/20180416213036844.png" alt="20180416213036844"></p><p><img src="/Images/20180416213119987.png" alt="20180416213119987"></p><p><img src="/Images/20180416213126857.png" alt="20180416213126857"></p><h3 id="0x05-其他"><a href="#0x05-其他" class="headerlink" title="0x05 其他"></a>0x05 其他</h3><p><a href="https://blog.csdn.net/Snakewood/article/details/130445273">纯手打可复制的数学公式表</a></p>]]></content>
+        <content type="html"><![CDATA[<h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><p>打算记录一些数学题目，发现不会编辑数学公式，遂记录。</p><p>编辑数学公式前，要将其囊括在首尾两个美元符号的大括号中。</p><h2 id="0x02-常用符号"><a href="#0x02-常用符号" class="headerlink" title="0x02 常用符号"></a>0x02 常用符号</h2><p>整合一些常用的符号例如古希腊字母，积分符号，求和符号等等。</p><h3 id="古希腊字母"><a href="#古希腊字母" class="headerlink" title="古希腊字母"></a>古希腊字母</h3><p><img src="/Images/image-20240402181057758.png" alt="image-20240402181057758"></p><h3 id="各种运算符号"><a href="#各种运算符号" class="headerlink" title="各种运算符号"></a>各种运算符号</h3><p><img src="/Images/image-20240402181435055.png" alt="image-20240402181435055"></p><h3 id="三角函数和对数"><a href="#三角函数和对数" class="headerlink" title="三角函数和对数"></a>三角函数和对数</h3><p>只需要在反斜杠后加上对应字母表示</p><p>补充一下圆周率是pi</p><h3 id="向量符号和根号等"><a href="#向量符号和根号等" class="headerlink" title="向量符号和根号等"></a>向量符号和根号等</h3><p><img src="/Images/image-20240402181724770.png" alt="image-20240402181724770"></p><h3 id="调整大小"><a href="#调整大小" class="headerlink" title="调整大小"></a>调整大小</h3><p>主要是math mode</p><p><img src="/Images/image-20240402181825954.png" alt="image-20240402181825954"></p><h2 id="0x03-基本编辑方法"><a href="#0x03-基本编辑方法" class="headerlink" title="0x03 基本编辑方法"></a>0x03 基本编辑方法</h2><p>记录一些数学公式编辑方法</p><h3 id="如何输入上下标"><a href="#如何输入上下标" class="headerlink" title="如何输入上下标"></a>如何输入上下标</h3><p><code>^</code> 表示上表，<code>_</code> 表示下标，如果上下标的内容多于一个字符，需要用 <code>&#123;&#125;</code>将这些内容括成一个整体</p><p>​                                                                <script type="math/tex">{e{^x_y}=(x+2)^5}</script></p><p>​                                                                 ${e{^x_y}=(x+2)^5}$</p><h3 id="如何显示分数"><a href="#如何显示分数" class="headerlink" title="如何显示分数"></a>如何显示分数</h3><p>通常使用 <code>\frac &#123;分子&#125; &#123;分母&#125;</code> 来生成一个分数，分数可多层嵌套。如果分式较为复杂，亦可使用 <code>分子 \over 分母</code> 此时分数仅有一层</p><p>​                                                    <script type="math/tex">{\frac{x+1}{y+1}=\frac xy}</script></p><p>​                                                                    ${\frac{x+1}{y+1}=\frac xy}$</p><p>或者使用<code>\frac ab</code>快速生成一个a/b</p><h3 id="如何输入省略号"><a href="#如何输入省略号" class="headerlink" title="如何输入省略号"></a>如何输入省略号</h3><p>数学公式中常见的省略号有两种，<code>\ldots</code> 表示与 <strong>文本底线</strong> 对齐的省略号，<code>\cdots</code> 表示与 <strong>文本中线</strong> 对齐的省略号</p><h3 id="如何输入积分"><a href="#如何输入积分" class="headerlink" title="如何输入积分"></a>如何输入积分</h3><p>使用 <code>\int_积分下限^积分上限 &#123;被积表达式&#125;</code> 来输入一个积分</p><p>​                                                    <script type="math/tex">{\int{_1^2}{f^{-1}(x)dx}}</script></p><p>​                                                                 ${\int{_1^2}{f^{-1}(x)dx}}$</p><h3 id="如何输入极限"><a href="#如何输入极限" class="headerlink" title="如何输入极限"></a>如何输入极限</h3><p>使用 <code>\lim_&#123;变量 \to 表达式&#125; 表达式</code> 来输入一个极限。如有需求，可以更改 <code>\to</code> 符号至任意符号</p><p>​                                                <script type="math/tex">{\lim_{x \to \infty}\frac{sinx}{x}}</script></p><p>​                                                                  ${\lim_{x \to \infty}\frac{sinx}{x}}$</p><h2 id="0x04-符号汇总"><a href="#0x04-符号汇总" class="headerlink" title="0x04 符号汇总"></a>0x04 符号汇总</h2><p><img src="/Images/2018041621294865.png" alt="2018041621294865"></p><p><img src="/Images/20180416213036844.png" alt="20180416213036844"></p><p><img src="/Images/20180416213119987.png" alt="20180416213119987"></p><p><img src="/Images/20180416213126857.png" alt="20180416213126857"></p><h3 id="0x05-其他"><a href="#0x05-其他" class="headerlink" title="0x05 其他"></a>0x05 其他</h3><p><a href="https://blog.csdn.net/Snakewood/article/details/130445273">纯手打可复制的数学公式表</a></p>]]></content>
       
       
       <categories>
@@ -638,9 +638,9 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -660,55 +660,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/runtime.js"/>
-      <url>/js/runtime.js</url>
-      
-        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
-      
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/universe.css"/>
-      <url>/css/universe.css</url>
-      
-        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
       
     </entry>
     
@@ -726,9 +682,53 @@
     
     
     <entry>
+      <title></title>
+      <link href="/css/universe.css"/>
+      <url>/css/universe.css</url>
+      
+        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
+      
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/runtime.js"/>
+      <url>/js/runtime.js</url>
+      
+        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>视频</title>
       <link href="/movies/index.html"/>
       <url>/movies/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
