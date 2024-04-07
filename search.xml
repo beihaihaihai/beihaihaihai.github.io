@@ -74,9 +74,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
             <tag> cum15-213 </tag>
             
@@ -168,6 +168,33 @@
     
     
     <entry>
+      <title>vector容器基础</title>
+      <link href="/2024/02/24/vector%E5%AE%B9%E5%99%A8/"/>
+      <url>/2024/02/24/vector%E5%AE%B9%E5%99%A8/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-vector构造函数"><a href="#0x01-vector构造函数" class="headerlink" title="0x01 vector构造函数"></a>0x01 vector构造函数</h2><p><img src="/Images/adfb98be36cf58f17c2a79b8087f429.png" alt="adfb98be36cf58f17c2a79b8087f429"></p><p>除了第一种，其他几种基本都是拷贝构造而来的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v</span>(<span class="number">10</span>,<span class="number">100</span>);</span><br><span class="line"><span class="comment">//压入10个100的int数</span></span><br></pre></td></tr></table></figure><p>拷贝构造函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v2</span>(v);</span><br><span class="line"><span class="comment">//拷贝了v的10个100</span></span><br></pre></td></tr></table></figure><h2 id="0x02-vector赋值操作"><a href="#0x02-vector赋值操作" class="headerlink" title="0x02 vector赋值操作"></a>0x02 vector赋值操作</h2><p><img src="/Images/image-20240219145512229.png" alt="image-20240219145512229"></p><p>第一种就是等号运算符重载，直接v1 = v2赋值就好了。</p><h2 id="0x03-vector容量和大小"><a href="#0x03-vector容量和大小" class="headerlink" title="0x03 vector容量和大小"></a>0x03 vector容量和大小</h2><p><img src="/Images/image-20240219153402588.png" alt="image-20240219153402588"></p><p>empty( )，若容量为空则返回true，不为空则返回false。</p><p>capacity( )是返回容器的容量的函数，容器的容量不小于容器中元素的个数（常识）。</p><p>resize函数能调整容器的大小（长度size，并非容量）。</p><p>resize函数若不指定填充的元素elem，则默认填充0。</p><h2 id="0x04-vector插入和删除"><a href="#0x04-vector插入和删除" class="headerlink" title="0x04 vector插入和删除"></a>0x04 vector插入和删除</h2><p><img src="/Images/image-20240219160518544.png" alt="image-20240219160518544"></p><p>这里重点记录一下迭代器修改元素的方法。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//迭代器插入法</span></span><br><span class="line">v1.<span class="built_in">insert</span>(v1.<span class="built_in">begin</span>(),<span class="number">100</span>);</span><br><span class="line"><span class="comment">//在v1.begin()的位置插入100，v1.begin()是指向首元的迭代器</span></span><br></pre></td></tr></table></figure><p>注意const_iterator pos 位置是传入迭代器就好了。</p><h2 id="0x05-vector数据存取"><a href="#0x05-vector数据存取" class="headerlink" title="0x05 vector数据存取"></a>0x05 vector数据存取</h2><p><img src="/Images/image-20240219161554444.png" alt="image-20240219161554444"></p><p>没啥好注意的，一般都用[ ]重载来访问</p><h2 id="0x06-vector互换容器"><a href="#0x06-vector互换容器" class="headerlink" title="0x06 vector互换容器"></a>0x06 vector互换容器</h2><p><img src="/Images/image-20240219161831638.png" alt="image-20240219161831638"></p><p>实现两个容器内元素进行互换。</p><p>巧用swap可以收缩内存空间。</p><p>实际情况：假设你定义了一个容量很大的容器时，若当你不需要使用这么大的容量时，通过resize函数只能改变容器的大小，而容量不会改变，这时候多余的容量就遭到了浪费。</p><p>比如你push_back了10000个数据，容量会给你自动扩展到约13000的数据，这时候你resize(3)，将容器的大小调整至3，这时候容量依然是13000左右。这会造成浪费！！！</p><p>解决方法，匿名函数和swap函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(v).<span class="built_in">swap</span>(v);</span><br></pre></td></tr></table></figure><p>vector<int>(v) 默认构造匿名对象。这里会根据v目前所用的元素个数的大小来初始化匿名对象，在这里的例子里，大小为3。</p><p>然后调用 .swap(v)，v的容量经过swap交换后是 3，大小（size）也是 3，不会造成空间浪费了，匿名对象的容量经过swap后占用很大，但是在这一行执行完后匿名对象会被销毁，就不会造成空间浪费了。</p><p><img src="/Images/image-20240219182013042.png" alt="image-20240219182013042"></p><h2 id="0x07-vector预留空间"><a href="#0x07-vector预留空间" class="headerlink" title="0x07 vector预留空间"></a>0x07 vector预留空间</h2><p><img src="/Images/image-20240219182129095.png" alt="image-20240219182129095"></p><p>预留空间是为了，减少vector在动态扩展容量时的扩展次数。</p><p>vector容器在创建的时候是会先预留较多的空间来应对之后的扩展，比如我push_back了10个数据，编译器会事先将这个vector容器的容量设定成100多（大概的，反正比容器大小，元素个数多）。当你继续扩展这个容器时，可能超过了事先预留好的容量，这时候编译器会将原先的容器内的数据拷贝到一个新的，容量更大的容器中，虽然容器的名字不会变，但是该容器的首地址会发生了改变（因为数据被拷贝存储到了一个新开辟的空间）。</p><p>经过浅显的测试，10000个数据在push_back时大约会发生30次的新开辟存储空间的情况，浪费了时间资源。</p><p>测试代码如下</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; v;</span><br><span class="line"><span class="comment">//统计开辟次数</span></span><br><span class="line"><span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++)&#123;</span><br><span class="line">    v.<span class="built_in">push_back</span>(i);</span><br><span class="line">    <span class="comment">//当每次开辟新空间时，v[0]的地址就会变化，以此为参照统计开辟次数</span></span><br><span class="line">    <span class="keyword">if</span>(p!= &amp;v[<span class="number">0</span>])&#123;</span><br><span class="line">        p = &amp;v[<span class="number">0</span>];</span><br><span class="line">        cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">cout &lt;&lt; cnt;</span><br></pre></td></tr></table></figure><p>所以一开始就先预留出容量，能减少扩展次数。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> 进阶 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>线段树转载记录</title>
       <link href="/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/"/>
       <url>/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/</url>
@@ -191,33 +218,6 @@
             <tag> 算法 </tag>
             
             <tag> 数据结构 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>vector容器基础</title>
-      <link href="/2024/02/24/vector%E5%AE%B9%E5%99%A8/"/>
-      <url>/2024/02/24/vector%E5%AE%B9%E5%99%A8/</url>
-      
-        <content type="html"><![CDATA[<h2 id="0x01-vector构造函数"><a href="#0x01-vector构造函数" class="headerlink" title="0x01 vector构造函数"></a>0x01 vector构造函数</h2><p><img src="/Images/adfb98be36cf58f17c2a79b8087f429.png" alt="adfb98be36cf58f17c2a79b8087f429"></p><p>除了第一种，其他几种基本都是拷贝构造而来的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v</span>(<span class="number">10</span>,<span class="number">100</span>);</span><br><span class="line"><span class="comment">//压入10个100的int数</span></span><br></pre></td></tr></table></figure><p>拷贝构造函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v2</span>(v);</span><br><span class="line"><span class="comment">//拷贝了v的10个100</span></span><br></pre></td></tr></table></figure><h2 id="0x02-vector赋值操作"><a href="#0x02-vector赋值操作" class="headerlink" title="0x02 vector赋值操作"></a>0x02 vector赋值操作</h2><p><img src="/Images/image-20240219145512229.png" alt="image-20240219145512229"></p><p>第一种就是等号运算符重载，直接v1 = v2赋值就好了。</p><h2 id="0x03-vector容量和大小"><a href="#0x03-vector容量和大小" class="headerlink" title="0x03 vector容量和大小"></a>0x03 vector容量和大小</h2><p><img src="/Images/image-20240219153402588.png" alt="image-20240219153402588"></p><p>empty( )，若容量为空则返回true，不为空则返回false。</p><p>capacity( )是返回容器的容量的函数，容器的容量不小于容器中元素的个数（常识）。</p><p>resize函数能调整容器的大小（长度size，并非容量）。</p><p>resize函数若不指定填充的元素elem，则默认填充0。</p><h2 id="0x04-vector插入和删除"><a href="#0x04-vector插入和删除" class="headerlink" title="0x04 vector插入和删除"></a>0x04 vector插入和删除</h2><p><img src="/Images/image-20240219160518544.png" alt="image-20240219160518544"></p><p>这里重点记录一下迭代器修改元素的方法。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//迭代器插入法</span></span><br><span class="line">v1.<span class="built_in">insert</span>(v1.<span class="built_in">begin</span>(),<span class="number">100</span>);</span><br><span class="line"><span class="comment">//在v1.begin()的位置插入100，v1.begin()是指向首元的迭代器</span></span><br></pre></td></tr></table></figure><p>注意const_iterator pos 位置是传入迭代器就好了。</p><h2 id="0x05-vector数据存取"><a href="#0x05-vector数据存取" class="headerlink" title="0x05 vector数据存取"></a>0x05 vector数据存取</h2><p><img src="/Images/image-20240219161554444.png" alt="image-20240219161554444"></p><p>没啥好注意的，一般都用[ ]重载来访问</p><h2 id="0x06-vector互换容器"><a href="#0x06-vector互换容器" class="headerlink" title="0x06 vector互换容器"></a>0x06 vector互换容器</h2><p><img src="/Images/image-20240219161831638.png" alt="image-20240219161831638"></p><p>实现两个容器内元素进行互换。</p><p>巧用swap可以收缩内存空间。</p><p>实际情况：假设你定义了一个容量很大的容器时，若当你不需要使用这么大的容量时，通过resize函数只能改变容器的大小，而容量不会改变，这时候多余的容量就遭到了浪费。</p><p>比如你push_back了10000个数据，容量会给你自动扩展到约13000的数据，这时候你resize(3)，将容器的大小调整至3，这时候容量依然是13000左右。这会造成浪费！！！</p><p>解决方法，匿名函数和swap函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(v).<span class="built_in">swap</span>(v);</span><br></pre></td></tr></table></figure><p>vector<int>(v) 默认构造匿名对象。这里会根据v目前所用的元素个数的大小来初始化匿名对象，在这里的例子里，大小为3。</p><p>然后调用 .swap(v)，v的容量经过swap交换后是 3，大小（size）也是 3，不会造成空间浪费了，匿名对象的容量经过swap后占用很大，但是在这一行执行完后匿名对象会被销毁，就不会造成空间浪费了。</p><p><img src="/Images/image-20240219182013042.png" alt="image-20240219182013042"></p><h2 id="0x07-vector预留空间"><a href="#0x07-vector预留空间" class="headerlink" title="0x07 vector预留空间"></a>0x07 vector预留空间</h2><p><img src="/Images/image-20240219182129095.png" alt="image-20240219182129095"></p><p>预留空间是为了，减少vector在动态扩展容量时的扩展次数。</p><p>vector容器在创建的时候是会先预留较多的空间来应对之后的扩展，比如我push_back了10个数据，编译器会事先将这个vector容器的容量设定成100多（大概的，反正比容器大小，元素个数多）。当你继续扩展这个容器时，可能超过了事先预留好的容量，这时候编译器会将原先的容器内的数据拷贝到一个新的，容量更大的容器中，虽然容器的名字不会变，但是该容器的首地址会发生了改变（因为数据被拷贝存储到了一个新开辟的空间）。</p><p>经过浅显的测试，10000个数据在push_back时大约会发生30次的新开辟存储空间的情况，浪费了时间资源。</p><p>测试代码如下</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; v;</span><br><span class="line"><span class="comment">//统计开辟次数</span></span><br><span class="line"><span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++)&#123;</span><br><span class="line">    v.<span class="built_in">push_back</span>(i);</span><br><span class="line">    <span class="comment">//当每次开辟新空间时，v[0]的地址就会变化，以此为参照统计开辟次数</span></span><br><span class="line">    <span class="keyword">if</span>(p!= &amp;v[<span class="number">0</span>])&#123;</span><br><span class="line">        p = &amp;v[<span class="number">0</span>];</span><br><span class="line">        cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">cout &lt;&lt; cnt;</span><br></pre></td></tr></table></figure><p>所以一开始就先预留出容量，能减少扩展次数。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> 进阶 </tag>
             
         </tags>
       
@@ -300,9 +300,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -354,9 +354,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -381,9 +381,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -396,7 +396,7 @@
       <link href="/2024/02/14/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E5%A4%A7%E5%85%A8/"/>
       <url>/2024/02/14/%E6%95%B0%E5%AD%A6%E5%85%AC%E5%BC%8F%E5%A4%A7%E5%85%A8/</url>
       
-        <content type="html"><![CDATA[<h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><p>打算记录一些数学题目，发现不会编辑数学公式，遂记录。</p><p>编辑数学公式前，要将其囊括在首尾两个美元符号的大括号中。</p><h2 id="0x02-常用符号"><a href="#0x02-常用符号" class="headerlink" title="0x02 常用符号"></a>0x02 常用符号</h2><p>整合一些常用的符号例如古希腊字母，积分符号，求和符号等等。</p><h3 id="古希腊字母"><a href="#古希腊字母" class="headerlink" title="古希腊字母"></a>古希腊字母</h3><p><img src="/Images/image-20240402181057758.png" alt="image-20240402181057758"></p><h3 id="各种运算符号"><a href="#各种运算符号" class="headerlink" title="各种运算符号"></a>各种运算符号</h3><p><img src="/Images/image-20240402181435055.png" alt="image-20240402181435055"></p><h3 id="三角函数和对数"><a href="#三角函数和对数" class="headerlink" title="三角函数和对数"></a>三角函数和对数</h3><p>只需要在反斜杠后加上对应字母表示</p><p>补充一下圆周率是pi</p><h3 id="向量符号和根号等"><a href="#向量符号和根号等" class="headerlink" title="向量符号和根号等"></a>向量符号和根号等</h3><p><img src="/Images/image-20240402181724770.png" alt="image-20240402181724770"></p><h3 id="调整大小"><a href="#调整大小" class="headerlink" title="调整大小"></a>调整大小</h3><p>主要是math mode</p><p><img src="/Images/image-20240402181825954.png" alt="image-20240402181825954"></p><h2 id="0x03-基本编辑方法"><a href="#0x03-基本编辑方法" class="headerlink" title="0x03 基本编辑方法"></a>0x03 基本编辑方法</h2><p>记录一些数学公式编辑方法</p><h3 id="如何输入上下标"><a href="#如何输入上下标" class="headerlink" title="如何输入上下标"></a>如何输入上下标</h3><p><code>^</code> 表示上表，<code>_</code> 表示下标，如果上下标的内容多于一个字符，需要用 <code>&#123;&#125;</code>将这些内容括成一个整体</p><p>​                                                                <script type="math/tex">{e{^x_y}=(x+2)^5}</script></p><p>​                                                                 ${e{^x_y}=(x+2)^5}$</p><h3 id="如何显示分数"><a href="#如何显示分数" class="headerlink" title="如何显示分数"></a>如何显示分数</h3><p>通常使用 <code>\frac &#123;分子&#125; &#123;分母&#125;</code> 来生成一个分数，分数可多层嵌套。如果分式较为复杂，亦可使用 <code>分子 \over 分母</code> 此时分数仅有一层</p><p>​                                                    <script type="math/tex">{\frac{x+1}{y+1}=\frac xy}</script></p><p>​                                                                    ${\frac{x+1}{y+1}=\frac xy}$</p><p>或者使用<code>\frac ab</code>快速生成一个a/b</p><h3 id="如何输入省略号"><a href="#如何输入省略号" class="headerlink" title="如何输入省略号"></a>如何输入省略号</h3><p>数学公式中常见的省略号有两种，<code>\ldots</code> 表示与 <strong>文本底线</strong> 对齐的省略号，<code>\cdots</code> 表示与 <strong>文本中线</strong> 对齐的省略号</p><h3 id="如何输入积分"><a href="#如何输入积分" class="headerlink" title="如何输入积分"></a>如何输入积分</h3><p>使用 <code>\int_积分下限^积分上限 &#123;被积表达式&#125;</code> 来输入一个积分</p><p>​                                                    <script type="math/tex">{\int{_1^2}{f^{-1}(x)dx}}</script></p><p>​                                                                 ${\int{_1^2}{f^{-1}(x)dx}}$</p><h3 id="如何输入极限"><a href="#如何输入极限" class="headerlink" title="如何输入极限"></a>如何输入极限</h3><p>使用 <code>\lim_&#123;变量 \to 表达式&#125; 表达式</code> 来输入一个极限。如有需求，可以更改 <code>\to</code> 符号至任意符号</p><p>​                                                <script type="math/tex">{\lim_{x \to \infty}\frac{sinx}{x}}</script></p><p>​                                                                   ${\lim_{x \to \infty}\frac{sinx}{x}}$</p><h2 id="0x04-符号汇总"><a href="#0x04-符号汇总" class="headerlink" title="0x04 符号汇总"></a>0x04 符号汇总</h2><p><img src="/Images/2018041621294865.png" alt="2018041621294865"></p><p><img src="/Images/20180416213036844.png" alt="20180416213036844"></p><p><img src="/Images/20180416213119987.png" alt="20180416213119987"></p><p><img src="/Images/20180416213126857.png" alt="20180416213126857"></p><h3 id="0x05-其他"><a href="#0x05-其他" class="headerlink" title="0x05 其他"></a>0x05 其他</h3><p><a href="https://blog.csdn.net/Snakewood/article/details/130445273">纯手打可复制的数学公式表</a></p>]]></content>
+        <content type="html"><![CDATA[<h2 id="0x01-前言"><a href="#0x01-前言" class="headerlink" title="0x01 前言"></a>0x01 前言</h2><p>打算记录一些数学题目，发现不会编辑数学公式，遂记录。</p><p>编辑数学公式前，要将其囊括在首尾两个美元符号的大括号中。</p><h2 id="0x02-常用符号"><a href="#0x02-常用符号" class="headerlink" title="0x02 常用符号"></a>0x02 常用符号</h2><p>整合一些常用的符号例如古希腊字母，积分符号，求和符号等等。</p><h3 id="古希腊字母"><a href="#古希腊字母" class="headerlink" title="古希腊字母"></a>古希腊字母</h3><p><img src="/Images/image-20240402181057758.png" alt="image-20240402181057758"></p><h3 id="各种运算符号"><a href="#各种运算符号" class="headerlink" title="各种运算符号"></a>各种运算符号</h3><p><img src="/Images/image-20240402181435055.png" alt="image-20240402181435055"></p><h3 id="三角函数和对数"><a href="#三角函数和对数" class="headerlink" title="三角函数和对数"></a>三角函数和对数</h3><p>只需要在反斜杠后加上对应字母表示</p><p>补充一下圆周率是pi</p><h3 id="向量符号和根号等"><a href="#向量符号和根号等" class="headerlink" title="向量符号和根号等"></a>向量符号和根号等</h3><p><img src="/Images/image-20240402181724770.png" alt="image-20240402181724770"></p><h3 id="调整大小"><a href="#调整大小" class="headerlink" title="调整大小"></a>调整大小</h3><p>主要是math mode</p><p><img src="/Images/image-20240402181825954.png" alt="image-20240402181825954"></p><h2 id="0x03-基本编辑方法"><a href="#0x03-基本编辑方法" class="headerlink" title="0x03 基本编辑方法"></a>0x03 基本编辑方法</h2><p>记录一些数学公式编辑方法</p><h3 id="如何输入上下标"><a href="#如何输入上下标" class="headerlink" title="如何输入上下标"></a>如何输入上下标</h3><p><code>^</code> 表示上表，<code>_</code> 表示下标，如果上下标的内容多于一个字符，需要用 <code>&#123;&#125;</code>将这些内容括成一个整体</p><p>​                                                                $$${e{^x_y}=(x+2)^5}$$$</p><p>​                                                                 <script type="math/tex">{e{^x_y}=(x+2)^5}</script></p><h3 id="如何显示分数"><a href="#如何显示分数" class="headerlink" title="如何显示分数"></a>如何显示分数</h3><p>通常使用 <code>\frac &#123;分子&#125; &#123;分母&#125;</code> 来生成一个分数，分数可多层嵌套。如果分式较为复杂，亦可使用 <code>分子 \over 分母</code> 此时分数仅有一层</p><p>​                                                    $$${\frac{x+1}{y+1}=\frac xy}$$$</p><p>​                                                                    <script type="math/tex">{\frac{x+1}{y+1}=\frac xy}</script></p><p>或者使用<code>\frac ab</code>快速生成一个a/b</p><h3 id="如何输入省略号"><a href="#如何输入省略号" class="headerlink" title="如何输入省略号"></a>如何输入省略号</h3><p>数学公式中常见的省略号有两种，<code>\ldots</code> 表示与 <strong>文本底线</strong> 对齐的省略号，<code>\cdots</code> 表示与 <strong>文本中线</strong> 对齐的省略号</p><h3 id="如何输入积分"><a href="#如何输入积分" class="headerlink" title="如何输入积分"></a>如何输入积分</h3><p>使用 <code>\int_积分下限^积分上限 &#123;被积表达式&#125;</code> 来输入一个积分</p><p>​                                                    $$${\int{_1^2}{f^{-1}(x)dx}}$$$</p><p>​                                                                 <script type="math/tex">{\int{_1^2}{f^{-1}(x)dx}}</script></p><h3 id="如何输入极限"><a href="#如何输入极限" class="headerlink" title="如何输入极限"></a>如何输入极限</h3><p>使用 <code>\lim_&#123;变量 \to 表达式&#125; 表达式</code> 来输入一个极限。如有需求，可以更改 <code>\to</code> 符号至任意符号</p><p>​                                                $$${\lim_{x \to \infty}\frac{sinx}{x}}$$$</p><p>​                                                                  <script type="math/tex">{\lim_{x \to \infty}\frac{sinx}{x}}</script></p><h2 id="0x04-符号汇总"><a href="#0x04-符号汇总" class="headerlink" title="0x04 符号汇总"></a>0x04 符号汇总</h2><p><img src="/Images/2018041621294865.png" alt="2018041621294865"></p><p><img src="/Images/20180416213036844.png" alt="20180416213036844"></p><p><img src="/Images/20180416213119987.png" alt="20180416213119987"></p><p><img src="/Images/20180416213126857.png" alt="20180416213126857"></p><h3 id="0x05-其他"><a href="#0x05-其他" class="headerlink" title="0x05 其他"></a>0x05 其他</h3><p><a href="https://blog.csdn.net/Snakewood/article/details/130445273">纯手打可复制的数学公式表</a></p>]]></content>
       
       
       <categories>
@@ -516,9 +516,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -570,9 +570,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -597,9 +597,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -638,9 +638,9 @@
     
     
     <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -652,39 +652,6 @@
       <title>分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/universe.css"/>
-      <url>/css/universe.css</url>
-      
-        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>游戏</title>
-      <link href="/games/index.html"/>
-      <url>/games/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -709,6 +676,50 @@
       <url>/js/universe.js</url>
       
         <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/universe.css"/>
+      <url>/css/universe.css</url>
+      
+        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>游戏</title>
+      <link href="/games/index.html"/>
+      <url>/games/index.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
       
     </entry>
     
@@ -740,17 +751,6 @@
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
