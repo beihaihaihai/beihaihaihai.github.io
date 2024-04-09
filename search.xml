@@ -4,6 +4,25 @@
   
     
     <entry>
+      <title>emplace_back()</title>
+      <link href="/2024/04/09/emplace-back/"/>
+      <url>/2024/04/09/emplace-back/</url>
+      
+        <content type="html"><![CDATA[<h2 id="emplace-back"><a href="#emplace-back" class="headerlink" title="emplace_back( )"></a>emplace_back( )</h2><p>在容器末尾添加一个新元素，它通常使用 placement-new 在容器提供的位置就地构造元素。</p><p>通常要保证操作后的size不大于旧的capacity（end迭代器要重新生成），否则需要重新分配内存，这种情况下所有迭代器和对元素的所有引用都会失效。</p><p>下面代码是从cpp reference抄来的，理解一下怎么运行的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">auto</span>&amp; ref = elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson Mandela&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line">    <span class="built_in">assert</span>(ref.year == <span class="number">1994</span> &amp;&amp; <span class="string">&quot;uses a reference to the created object (C++17)&quot;</span>);</span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin Delano Roosevelt&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line"> </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nContents:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: elections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: reElections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was re-elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>下面的是Output：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">emplace_back:</span><br><span class="line">I am being constructed.</span><br><span class="line"> </span><br><span class="line">push_back:</span><br><span class="line">I am being constructed.</span><br><span class="line">I am being moved.</span><br><span class="line"> </span><br><span class="line">Contents:</span><br><span class="line">Nelson Mandela was elected president of South Africa in 1994.</span><br><span class="line">Franklin Delano Roosevelt was re-elected president of the USA in 1936.</span><br></pre></td></tr></table></figure><h2 id="解析代码"><a href="#解析代码" class="headerlink" title="解析代码"></a>解析代码</h2><h3 id="default"><a href="#default" class="headerlink" title="= default"></a>= default</h3><p><code>President&amp; operator=(const President&amp; other) = default;</code></p><p>这串代码里的<code>= default</code>使得编译器将会提供该函数的默认实现，并且保证这些默认实现不会被删除；构造函数和析构函数将提供默认的空实现。</p><p>作用：</p><p>1、生成默认实现：当一个类没有显式定义构造函数或析构函数时，编译器会自动生成默认的构造函数或析构函数。如果我们在类中使用了default关键字，则可以显式地告诉编译器使用默认的实现。</p><p>2、防止默认实现被删除：在某些情况下，编译器不会生成默认的构造函数或析构函数，例如当类包含了一个用户自定义的构造函数或析构函数时。如果我们想要让编译器生成默认的实现，可以在类定义中使用default关键字来显式声明默认的构造函数或析构函数。（例子里属于这种）</p><h3 id="std-move"><a href="#std-move" class="headerlink" title="std : : move"></a>std : : move</h3><p><code>name(std::move(p_name))</code>这里的p_name作为一个右值，通过std::move绑定左值name，相当于构造函数里给name赋值。</p><h3 id="构造函数President"><a href="#构造函数President" class="headerlink" title="构造函数President"></a>构造函数President</h3><p>这里构造函数有两种手动实现，第一种直接传入三个参数构造，第二种传入类other再构造，通过输出很容易发现，通过emplace_back构造的函数直接通过第一种构造，传入参数，不需要生成类再拷贝。</p><p>通过push_back的输出发现，会先构造President类，再通过第二种构造拷贝构造，需要两步。</p><h3 id="c-11的for"><a href="#c-11的for" class="headerlink" title="c++11的for"></a>c++11的for</h3><p><code>for (President const&amp; president: elections)</code></p><p>先定义一个变量，这里是president，然后从序列elections一个一个取出全部元素循环。（例子里这里只有一个President变量elections，只循环一次，将elections作为president取出）。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这段代码就是让你看透emplace_back和push_back添加元素的本质区别。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 基础 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>栈和寄存器</title>
       <link href="/2024/04/09/%E6%A0%88%E5%92%8C%E5%AF%84%E5%AD%98%E5%99%A8/"/>
       <url>/2024/04/09/%E6%A0%88%E5%92%8C%E5%AF%84%E5%AD%98%E5%99%A8/</url>
@@ -25,7 +44,7 @@
     
     
     <entry>
-      <title>栈和寄存器</title>
+      <title>结构体数据类型所占字节长度</title>
       <link href="/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/"/>
       <url>/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/</url>
       
@@ -38,19 +57,6 @@
             <tag> 基础 </tag>
             
         </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/2024/04/08/emplace-back/"/>
-      <url>/2024/04/08/emplace-back/</url>
-      
-        <content type="html"><![CDATA[<h2 id="emplace-back"><a href="#emplace-back" class="headerlink" title="emplace_back( )"></a>emplace_back( )</h2><p>在容器末尾添加一个新元素，它通常使用 placement-new 在容器提供的位置就地构造元素。</p><p>通常要保证操作后的size不大于旧的capacity（end迭代器要重新生成），否则需要重新分配内存，这种情况下所有迭代器和对元素的所有引用都会失效。</p><p>下面代码是从cpp reference抄来的，理解一下怎么运行的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">auto</span>&amp; ref = elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson Mandela&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line">    <span class="built_in">assert</span>(ref.year == <span class="number">1994</span> &amp;&amp; <span class="string">&quot;uses a reference to the created object (C++17)&quot;</span>);</span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin Delano Roosevelt&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line"> </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nContents:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: elections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: reElections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was re-elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>下面的是Output：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">emplace_back:</span><br><span class="line">I am being constructed.</span><br><span class="line"> </span><br><span class="line">push_back:</span><br><span class="line">I am being constructed.</span><br><span class="line">I am being moved.</span><br><span class="line"> </span><br><span class="line">Contents:</span><br><span class="line">Nelson Mandela was elected president of South Africa in 1994.</span><br><span class="line">Franklin Delano Roosevelt was re-elected president of the USA in 1936.</span><br></pre></td></tr></table></figure><h2 id="解析代码"><a href="#解析代码" class="headerlink" title="解析代码"></a>解析代码</h2><h3 id="default"><a href="#default" class="headerlink" title="= default"></a>= default</h3><p><code>President&amp; operator=(const President&amp; other) = default;</code></p><p>这串代码里的<code>= default</code>使得编译器将会提供该函数的默认实现，并且保证这些默认实现不会被删除；构造函数和析构函数将提供默认的空实现。</p><p>作用：</p><p>1、生成默认实现：当一个类没有显式定义构造函数或析构函数时，编译器会自动生成默认的构造函数或析构函数。如果我们在类中使用了default关键字，则可以显式地告诉编译器使用默认的实现。</p><p>2、防止默认实现被删除：在某些情况下，编译器不会生成默认的构造函数或析构函数，例如当类包含了一个用户自定义的构造函数或析构函数时。如果我们想要让编译器生成默认的实现，可以在类定义中使用default关键字来显式声明默认的构造函数或析构函数。（例子里属于这种）</p><h3 id="std-move"><a href="#std-move" class="headerlink" title="std : : move"></a>std : : move</h3><p><code>name(std::move(p_name))</code>这里的p_name作为一个右值，通过std::move绑定左值name，相当于构造函数里给name赋值。</p><h3 id="构造函数President"><a href="#构造函数President" class="headerlink" title="构造函数President"></a>构造函数President</h3><p>这里构造函数有两种手动实现，第一种直接传入三个参数构造，第二种传入类other再构造，通过输出很容易发现，通过emplace_back构造的函数直接通过第一种构造，传入参数，不需要生成类再拷贝。</p><p>通过push_back的输出发现，会先构造President类，再通过第二种构造拷贝构造，需要两步。</p><h3 id="c-11的for"><a href="#c-11的for" class="headerlink" title="c++11的for"></a>c++11的for</h3><p><code>for (President const&amp; president: elections)</code></p><p>先定义一个变量，这里是president，然后从序列elections一个一个取出全部元素循环。（例子里这里只有一个President变量elections，只循环一次，将elections作为president取出）。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这段代码就是让你看透emplace_back和push_back添加元素的本质区别。</p>]]></content>
-      
-      
       
     </entry>
     
@@ -148,9 +154,9 @@
       
         <tags>
             
-            <tag> 逆向 </tag>
-            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
             <tag> cum15-213 </tag>
             
@@ -374,9 +380,9 @@
       
         <tags>
             
-            <tag> 逆向 </tag>
-            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
         </tags>
       
@@ -412,33 +418,6 @@
     
     
     <entry>
-      <title>picoCTF</title>
-      <link href="/2024/02/14/picoCTF/"/>
-      <url>/2024/02/14/picoCTF/</url>
-      
-        <content type="html"><![CDATA[<h2 id="0x01-packer"><a href="#0x01-packer" class="headerlink" title="0x01 packer"></a>0x01 packer</h2><p>elf的upx打包，我用windows的upx解不出来，开了个虚拟机在linux下就可以解包了，一开始就有flag串，十六进制转一下字符串就得到了。</p><p>picoCTF{U9X_UnP4ck1N6_B1n4Ri3S_1a5a3f39}</p><h2 id="0x02-FactCheck"><a href="#0x02-FactCheck" class="headerlink" title="0x02 FactCheck"></a>0x02 FactCheck</h2><p>cpp程序，反编译出来很多很长，看了一下逻辑就是创建很多个字符变量，然后根据最后的逻辑按一定顺序的将这些字符append到半成品flag上，耐心看看就好了。</p><p>picoCTF{wELF_d0N3_mate_2394047a}</p><h2 id="0x03-WinAntiDbg0x100"><a href="#0x03-WinAntiDbg0x100" class="headerlink" title="0x03 WinAntiDbg0x100"></a>0x03 WinAntiDbg0x100</h2><p>介绍说是一个反调试，点进去我感觉是这个阻碍我调试了，被调试时这个函数返回result=1，外部有个if接收了这个1后会导致程序退出，我们单步调试时在外部那个if前停下，然后修改ZF标志位，就能使程序跑向解密的二进制文件的代码了，直接查看内存里的密文就能得到flag。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314112708882.png" alt="image-20240314112708882"></p><p>picoCTF{d3bug_for_th3_Win_0x100_e70398c9}</p><h2 id="0x04-Classic-Crackme-0x100"><a href="#0x04-Classic-Crackme-0x100" class="headerlink" title="0x04 Classic Crackme 0x100"></a>0x04 Classic Crackme 0x100</h2><p>elf程序用ida打开后是一串50个字符串的有与运算和位移运算的加密代码，总共加密三轮，每轮算出一个参数，我在脚本里命名为temp，是random2和secret3得出来的，然后每轮明文加这个temp再模26，我在脚本里直接写成加3倍temp模26，等价的。</p><p>代码里用0-25代替a-z，得先把密文转化成数字格式，最后再转化成字母格式。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">enc = <span class="string">&quot;mpknnphjngbhgzydttvkahppevhkmpwgdzxsykkokriepfnrdm&quot;</span></span><br><span class="line">enc1 = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(enc)):</span><br><span class="line">    enc1.append(<span class="built_in">ord</span>(enc[i])-<span class="number">97</span>)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">secret1 = <span class="number">0x55</span></span><br><span class="line">secret2 = <span class="number">0x33</span></span><br><span class="line">secret3 = <span class="number">0xF</span></span><br><span class="line">fix = <span class="number">97</span></span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(enc1)):</span><br><span class="line">    random1 = (secret1 &amp; (j % <span class="number">255</span>)) + (secret1 &amp; ((j % <span class="number">255</span>) &gt;&gt; <span class="number">1</span>))</span><br><span class="line">    random2 = (random1 &amp; secret2) + (secret2 &amp; (random1 &gt;&gt; <span class="number">2</span>))</span><br><span class="line">    temp = (random2 &amp; secret3) + (secret3 &amp; (random2 &gt;&gt; <span class="number">4</span>))</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="number">26</span>):</span><br><span class="line">        <span class="keyword">if</span> (k + <span class="number">3</span>*temp) % <span class="number">26</span> == enc1[j]:</span><br><span class="line">            flag += <span class="built_in">chr</span>(k+<span class="number">97</span>)</span><br><span class="line"><span class="built_in">print</span>(flag)</span><br><span class="line"><span class="comment">#mmhhkjbakavyaqprqnpbuygdymyyddkratrjsbbceizsgtbcxd</span></span><br></pre></td></tr></table></figure><p>开个kali虚拟机连接靶机，就能得到flag了。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/e7addc20847c375ec7ee3b052729983.png" alt="e7addc20847c375ec7ee3b052729983"></p><p>picoCTF{s0lv3_angry_symb0ls_ddcc130f}</p><h2 id="0x05-weirdSnake"><a href="#0x05-weirdSnake" class="headerlink" title="0x05 weirdSnake"></a>0x05 weirdSnake</h2><p>这题打开是一个二进制文件，然后用010editor打开发现是python字节码，python字节码类似于在python的虚拟机里执行的代码，各种操作码的详情可以见<a href="https://docs.python.org/zh-cn/3.8/library/dis.html">中文官网</a></p><p>LOAD_CONST是入栈，然后STORE_NAME是把栈顶元素赋值给key_str，LOAD _NAME是把key_str入栈。分析下图的过程，尝试翻译成简单的过程。（这里的BINARY_ADD均指str重载的加法，即字符串拼接）</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314201406973.png" alt="image-20240314201406973" style="zoom: 67%;" /></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">key = <span class="string">&quot;t_Jo3&quot;</span> </span><br><span class="line">enc = [<span class="number">4</span>,<span class="number">54</span>,<span class="number">41</span>,<span class="number">0</span>,<span class="number">112</span>,<span class="number">32</span>,<span class="number">25</span>,<span class="number">49</span>,<span class="number">33</span>,<span class="number">3</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">57</span>,<span class="number">32</span>,<span class="number">108</span>,<span class="number">23</span>,<span class="number">48</span>,<span class="number">4</span>,<span class="number">9</span>,<span class="number">70</span>,<span class="number">7</span>,</span><br><span class="line">       <span class="number">110</span>,<span class="number">36</span>,<span class="number">8</span>,<span class="number">108</span>,<span class="number">7</span>,<span class="number">49</span>,<span class="number">10</span>,<span class="number">4</span>,<span class="number">86</span>,<span class="number">43</span>,<span class="number">106</span>,<span class="number">123</span>,<span class="number">89</span>,<span class="number">87</span>,<span class="number">18</span>,<span class="number">62</span>,<span class="number">47</span>,<span class="number">10</span>,<span class="number">78</span>]</span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(enc)):</span><br><span class="line">       flag += <span class="built_in">chr</span>(<span class="built_in">ord</span>(key[i % <span class="number">5</span>]) ^ enc[i])</span><br><span class="line"><span class="built_in">print</span>(flag)</span><br><span class="line"><span class="comment">#picoCTF&#123;N0t_sO_coNfus1ng_sn@ke_516dfaee&#125;</span></span><br></pre></td></tr></table></figure><h2 id="0x06-WinAntiDbg0x200"><a href="#0x06-WinAntiDbg0x200" class="headerlink" title="0x06 WinAntiDbg0x200"></a>0x06 WinAntiDbg0x200</h2><p>和第一题dbg一样的做法，直接调试进去就好了。</p><p>picoCTF{0x200_debug_f0r_Win_c6db2768}</p><h2 id="0x07-WinAntiDbg0x300"><a href="#0x07-WinAntiDbg0x300" class="headerlink" title="0x07 WinAntiDbg0x300"></a>0x07 WinAntiDbg0x300</h2><p>升级版，进入主程序，在开头处下个断点一步步调试，进如图下面的函数，f7进入，这个是判断你有没有用管理员启动该程序的函数，进去后通过改ZF标志位绕过检测。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314194216397.png" alt="image-20240314194216397" style="zoom: 50%;" /></p><p>接着往下调试，这里有个创建线程的函数，进去下个断点，f9跑进去。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314194347174.png" alt="image-20240314194347174" style="zoom:50%;" /></p><p>进去后发现下面有个You got flag的字符串，直接跑进去！！！！！看看图形化界面就弹出了flag窗口。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314194444698.png" alt="image-20240314194444698"></p><p>picoCTF{Wind0ws_antid3bg_0x300_09b94ee8}</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> Re-wp </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 逆向 </tag>
-            
-            <tag> 基础 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>hgame_wp</title>
       <link href="/2024/02/14/hagme-week2/"/>
       <url>/2024/02/14/hagme-week2/</url>
@@ -455,9 +434,36 @@
       
         <tags>
             
+            <tag> 基础 </tag>
+            
             <tag> 逆向 </tag>
             
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>picoCTF</title>
+      <link href="/2024/02/14/picoCTF/"/>
+      <url>/2024/02/14/picoCTF/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-packer"><a href="#0x01-packer" class="headerlink" title="0x01 packer"></a>0x01 packer</h2><p>elf的upx打包，我用windows的upx解不出来，开了个虚拟机在linux下就可以解包了，一开始就有flag串，十六进制转一下字符串就得到了。</p><p>picoCTF{U9X_UnP4ck1N6_B1n4Ri3S_1a5a3f39}</p><h2 id="0x02-FactCheck"><a href="#0x02-FactCheck" class="headerlink" title="0x02 FactCheck"></a>0x02 FactCheck</h2><p>cpp程序，反编译出来很多很长，看了一下逻辑就是创建很多个字符变量，然后根据最后的逻辑按一定顺序的将这些字符append到半成品flag上，耐心看看就好了。</p><p>picoCTF{wELF_d0N3_mate_2394047a}</p><h2 id="0x03-WinAntiDbg0x100"><a href="#0x03-WinAntiDbg0x100" class="headerlink" title="0x03 WinAntiDbg0x100"></a>0x03 WinAntiDbg0x100</h2><p>介绍说是一个反调试，点进去我感觉是这个阻碍我调试了，被调试时这个函数返回result=1，外部有个if接收了这个1后会导致程序退出，我们单步调试时在外部那个if前停下，然后修改ZF标志位，就能使程序跑向解密的二进制文件的代码了，直接查看内存里的密文就能得到flag。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314112708882.png" alt="image-20240314112708882"></p><p>picoCTF{d3bug_for_th3_Win_0x100_e70398c9}</p><h2 id="0x04-Classic-Crackme-0x100"><a href="#0x04-Classic-Crackme-0x100" class="headerlink" title="0x04 Classic Crackme 0x100"></a>0x04 Classic Crackme 0x100</h2><p>elf程序用ida打开后是一串50个字符串的有与运算和位移运算的加密代码，总共加密三轮，每轮算出一个参数，我在脚本里命名为temp，是random2和secret3得出来的，然后每轮明文加这个temp再模26，我在脚本里直接写成加3倍temp模26，等价的。</p><p>代码里用0-25代替a-z，得先把密文转化成数字格式，最后再转化成字母格式。</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">enc = <span class="string">&quot;mpknnphjngbhgzydttvkahppevhkmpwgdzxsykkokriepfnrdm&quot;</span></span><br><span class="line">enc1 = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(enc)):</span><br><span class="line">    enc1.append(<span class="built_in">ord</span>(enc[i])-<span class="number">97</span>)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line">secret1 = <span class="number">0x55</span></span><br><span class="line">secret2 = <span class="number">0x33</span></span><br><span class="line">secret3 = <span class="number">0xF</span></span><br><span class="line">fix = <span class="number">97</span></span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(enc1)):</span><br><span class="line">    random1 = (secret1 &amp; (j % <span class="number">255</span>)) + (secret1 &amp; ((j % <span class="number">255</span>) &gt;&gt; <span class="number">1</span>))</span><br><span class="line">    random2 = (random1 &amp; secret2) + (secret2 &amp; (random1 &gt;&gt; <span class="number">2</span>))</span><br><span class="line">    temp = (random2 &amp; secret3) + (secret3 &amp; (random2 &gt;&gt; <span class="number">4</span>))</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="number">26</span>):</span><br><span class="line">        <span class="keyword">if</span> (k + <span class="number">3</span>*temp) % <span class="number">26</span> == enc1[j]:</span><br><span class="line">            flag += <span class="built_in">chr</span>(k+<span class="number">97</span>)</span><br><span class="line"><span class="built_in">print</span>(flag)</span><br><span class="line"><span class="comment">#mmhhkjbakavyaqprqnpbuygdymyyddkratrjsbbceizsgtbcxd</span></span><br></pre></td></tr></table></figure><p>开个kali虚拟机连接靶机，就能得到flag了。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/e7addc20847c375ec7ee3b052729983.png" alt="e7addc20847c375ec7ee3b052729983"></p><p>picoCTF{s0lv3_angry_symb0ls_ddcc130f}</p><h2 id="0x05-weirdSnake"><a href="#0x05-weirdSnake" class="headerlink" title="0x05 weirdSnake"></a>0x05 weirdSnake</h2><p>这题打开是一个二进制文件，然后用010editor打开发现是python字节码，python字节码类似于在python的虚拟机里执行的代码，各种操作码的详情可以见<a href="https://docs.python.org/zh-cn/3.8/library/dis.html">中文官网</a></p><p>LOAD_CONST是入栈，然后STORE_NAME是把栈顶元素赋值给key_str，LOAD _NAME是把key_str入栈。分析下图的过程，尝试翻译成简单的过程。（这里的BINARY_ADD均指str重载的加法，即字符串拼接）</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314201406973.png" alt="image-20240314201406973" style="zoom: 67%;" /></p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">key = <span class="string">&quot;t_Jo3&quot;</span> </span><br><span class="line">enc = [<span class="number">4</span>,<span class="number">54</span>,<span class="number">41</span>,<span class="number">0</span>,<span class="number">112</span>,<span class="number">32</span>,<span class="number">25</span>,<span class="number">49</span>,<span class="number">33</span>,<span class="number">3</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">57</span>,<span class="number">32</span>,<span class="number">108</span>,<span class="number">23</span>,<span class="number">48</span>,<span class="number">4</span>,<span class="number">9</span>,<span class="number">70</span>,<span class="number">7</span>,</span><br><span class="line">       <span class="number">110</span>,<span class="number">36</span>,<span class="number">8</span>,<span class="number">108</span>,<span class="number">7</span>,<span class="number">49</span>,<span class="number">10</span>,<span class="number">4</span>,<span class="number">86</span>,<span class="number">43</span>,<span class="number">106</span>,<span class="number">123</span>,<span class="number">89</span>,<span class="number">87</span>,<span class="number">18</span>,<span class="number">62</span>,<span class="number">47</span>,<span class="number">10</span>,<span class="number">78</span>]</span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(enc)):</span><br><span class="line">       flag += <span class="built_in">chr</span>(<span class="built_in">ord</span>(key[i % <span class="number">5</span>]) ^ enc[i])</span><br><span class="line"><span class="built_in">print</span>(flag)</span><br><span class="line"><span class="comment">#picoCTF&#123;N0t_sO_coNfus1ng_sn@ke_516dfaee&#125;</span></span><br></pre></td></tr></table></figure><h2 id="0x06-WinAntiDbg0x200"><a href="#0x06-WinAntiDbg0x200" class="headerlink" title="0x06 WinAntiDbg0x200"></a>0x06 WinAntiDbg0x200</h2><p>和第一题dbg一样的做法，直接调试进去就好了。</p><p>picoCTF{0x200_debug_f0r_Win_c6db2768}</p><h2 id="0x07-WinAntiDbg0x300"><a href="#0x07-WinAntiDbg0x300" class="headerlink" title="0x07 WinAntiDbg0x300"></a>0x07 WinAntiDbg0x300</h2><p>升级版，进入主程序，在开头处下个断点一步步调试，进如图下面的函数，f7进入，这个是判断你有没有用管理员启动该程序的函数，进去后通过改ZF标志位绕过检测。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314194216397.png" alt="image-20240314194216397" style="zoom: 50%;" /></p><p>接着往下调试，这里有个创建线程的函数，进去下个断点，f9跑进去。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314194347174.png" alt="image-20240314194347174" style="zoom:50%;" /></p><p>进去后发现下面有个You got flag的字符串，直接跑进去！！！！！看看图形化界面就弹出了flag窗口。</p><p><img src="../../../Hexo_Blog/blog-demo/source/Images/image-20240314194444698.png" alt="image-20240314194444698"></p><p>picoCTF{Wind0ws_antid3bg_0x300_09b94ee8}</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> Re-wp </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
         </tags>
       
@@ -563,9 +569,9 @@
       
         <tags>
             
-            <tag> 逆向 </tag>
-            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
         </tags>
       
@@ -617,9 +623,9 @@
       
         <tags>
             
-            <tag> 逆向 </tag>
-            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
         </tags>
       
@@ -644,9 +650,9 @@
       
         <tags>
             
-            <tag> 逆向 </tag>
-            
             <tag> 基础 </tag>
+            
+            <tag> 逆向 </tag>
             
         </tags>
       
@@ -685,6 +691,17 @@
     
     
     <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title></title>
       <link href="/css/universe.css"/>
       <url>/css/universe.css</url>
@@ -707,17 +724,6 @@
     
     
     <entry>
-      <title>游戏</title>
-      <link href="/games/index.html"/>
-      <url>/games/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>分类</title>
       <link href="/categories/index.html"/>
       <url>/categories/index.html</url>
@@ -729,33 +735,11 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>游戏</title>
+      <link href="/games/index.html"/>
+      <url>/games/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
-      
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/runtime.js"/>
-      <url>/js/runtime.js</url>
-      
-        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
+        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
       
     </entry>
     
@@ -784,11 +768,22 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title></title>
+      <link href="/js/runtime.js"/>
+      <url>/js/runtime.js</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
+      
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
       
     </entry>
     
@@ -798,6 +793,17 @@
       <title>音乐</title>
       <link href="/music/index.html"/>
       <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
