@@ -168,11 +168,11 @@
     
     
     <entry>
-      <title>联合和数据对齐</title>
-      <link href="/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%8C%E8%81%94%E5%90%88%E5%92%8C%E6%95%B0%E6%8D%AE%E5%AF%B9%E9%BD%90/"/>
-      <url>/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%8C%E8%81%94%E5%90%88%E5%92%8C%E6%95%B0%E6%8D%AE%E5%AF%B9%E9%BD%90/</url>
+      <title>结构体数据类型所占字节长度</title>
+      <link href="/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/"/>
+      <url>/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/</url>
       
-        <content type="html"><![CDATA[<h2 id="0x01-联合"><a href="#0x01-联合" class="headerlink" title="0x01 联合"></a>0x01 联合</h2><p>联合允许以多种类型来引用一个对象</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">union</span> <span class="title">U3</span>&#123;</span></span><br><span class="line"><span class="type">char</span> c;</span><br><span class="line">    <span class="type">int</span> i[<span class="number">2</span>];</span><br><span class="line">    <span class="type">double</span> v;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//三种数据结构仅能存储一种</span></span><br></pre></td></tr></table></figure><p>一个联合的总的大小等于它最大字段的大小</p><p>应用场景：</p><p>一个数据结构中的个不同字段的使用是互斥的，那么将这两个字段声明为联合的一部分 ，而不是结构的一部分，会减小分配空间的总量。</p><p>union还可以用来访问不同的数据类型的位模式，用一种数据类型才存储联合中的参数，又用另一种数据类型来访问它，除了有一样的位模式外，数值一般没有任何关联。</p><h2 id="0x02-数据对齐"><a href="#0x02-数据对齐" class="headerlink" title="0x02 数据对齐"></a>0x02 数据对齐</h2><p>许多计算机系统对基本数据类型的合法地址做出了 些限制，要求某种类型对象的地址必须是某个值 K( 通常是2，4或8) 的倍数。这种对齐限制简化了形成处理器和内存系统之间接口的硬件设计。</p><h3 id="对齐原则"><a href="#对齐原则" class="headerlink" title="对齐原则"></a>对齐原则</h3><p>对齐原则是任何K字节的基本对象的地址必须是K的倍数。</p><p><code>align 8</code>    </p><p>这段声明保证了它后面的数据的起始地址是8的倍数，常用于8字节数据类型的对齐。</p><h3 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h3><p>看下面的例子：</p><p>结构体的起始地址和其中的数据类型，一般要满足对齐（对齐大小一般最大的数据类型大小）。</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S1</span> &#123;</span> </span><br><span class="line"><span class="type">int</span> i; </span><br><span class="line"><span class="type">char</span> c; </span><br><span class="line"><span class="type">int</span> j; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p><img src="/Images/image-20240409180939599.png" alt="image-20240409180939599"></p><p>如图所示，蓝色部分为了满足对齐而被浪费了。</p><h3 id="结构体数组"><a href="#结构体数组" class="headerlink" title="结构体数组"></a>结构体数组</h3><p>结构的末尾有时候也需要填充，这样结构数组中的每个元素都会满足他们的对齐要求。</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S2</span> &#123;</span> </span><br><span class="line"><span class="type">int</span> i; </span><br><span class="line"><span class="type">int</span> j; </span><br><span class="line"><span class="type">char</span> c; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p><img src="/Images/image-20240409181218102.png" alt="image-20240409181218102"></p><p>只有在结构末尾填充，才能使得该结构体数组的每个结构的起始地址都是4的倍数。</p><h2 id="0x03-结构体内偏移和填充的具体分布"><a href="#0x03-结构体内偏移和填充的具体分布" class="headerlink" title="0x03 结构体内偏移和填充的具体分布"></a>0x03 结构体内偏移和填充的具体分布</h2><p>研究复杂结构体内部的填充是怎么进行的，可以参考<a href="https://www.beihaihaihai.top/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/">结构体数据类型的所占字节长度</a>。</p>]]></content>
+        <content type="html"><![CDATA[<p>记录一下结构体的数据类型大小怎么算，主要看对齐数和地址偏移量</p><h2 id="计算原理"><a href="#计算原理" class="headerlink" title="计算原理"></a>计算原理</h2><p>举个例子</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">student</span> &#123;</span><br><span class="line"><span class="type">int</span> num;</span><br><span class="line"><span class="type">char</span> name[<span class="number">10</span>];<span class="comment">//8 byte</span></span><br><span class="line"><span class="type">int</span> com, math, english;</span><br><span class="line"><span class="type">double</span> average;<span class="comment">//8 byte</span></span><br><span class="line">&#125; stu;</span><br><span class="line">stu boy[<span class="number">1000</span>], * p;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(stu)&lt;&lt;<span class="string">&quot;\n&quot;</span>;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(<span class="type">int</span>);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>对齐数的大小，在vs编译器里，是数据类型大小和默认对齐数（vs是8）的最小值。</p><p>从第二个数据开始，数据首个字节的地址的偏移量要为对齐数的整数倍</p><p>对于数据类型stu，num先填充4 bytes，之后第二个char name[10]的对齐数是10和8的较小值，为8 bytes，首地址应为8的整数倍的偏移地址量，最小为8，所以从8开始存放name，</p><p>第三个数据还是int，现在已经填充了num，4个0xcc，name，加起来偏移地址为18，int对齐数是4，再填充两个0xcc，从偏移地址20开始填充三个int，20+12=32，</p><p>第四个数据是double，对齐数是其64位的大小，8bytes，32是8的整数倍，可以直接填入，加起来是40，所以sizeof(stu) 的大小是40</p><p><img src="/Images/430208b28b1148d99a4e0b1d209590c4.png" alt="430208b28b1148d99a4e0b1d209590c4"></p><p>数组的情况是同理的，把他看成几个连续的单个数据算就好了</p><h2 id="当结构体中有其他结构体"><a href="#当结构体中有其他结构体" class="headerlink" title="当结构体中有其他结构体"></a>当结构体中有其他结构体</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">student</span> &#123;</span><br><span class="line"><span class="type">int</span> num;</span><br><span class="line"><span class="type">char</span> name[<span class="number">10</span>];<span class="comment">//8 byte</span></span><br><span class="line"><span class="type">int</span> com, math, english;</span><br><span class="line"><span class="type">double</span> average;<span class="comment">//8 byte</span></span><br><span class="line">&#125; stu;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">cls</span> &#123;</span><br><span class="line"><span class="type">int</span> class_number;</span><br><span class="line">stu one;</span><br><span class="line">&#125;;</span><br><span class="line">stu boy[<span class="number">1000</span>], * p;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(stu)&lt;&lt;<span class="string">&quot;\n&quot;</span>;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(cls);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>stu one 需要从其结构体内部数据的最大对齐数的整数倍的地址偏移量开始，这里内部最大是8，所以应该从cls里的地址偏移量为8开始存储，就是40+8=48。</p>]]></content>
       
       
       
@@ -187,11 +187,11 @@
     
     
     <entry>
-      <title>结构体数据类型所占字节长度</title>
-      <link href="/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/"/>
-      <url>/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/</url>
+      <title>联合和数据对齐</title>
+      <link href="/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%8C%E8%81%94%E5%90%88%E5%92%8C%E6%95%B0%E6%8D%AE%E5%AF%B9%E9%BD%90/"/>
+      <url>/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%EF%BC%8C%E8%81%94%E5%90%88%E5%92%8C%E6%95%B0%E6%8D%AE%E5%AF%B9%E9%BD%90/</url>
       
-        <content type="html"><![CDATA[<p>记录一下结构体的数据类型大小怎么算，主要看对齐数和地址偏移量</p><h2 id="计算原理"><a href="#计算原理" class="headerlink" title="计算原理"></a>计算原理</h2><p>举个例子</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">student</span> &#123;</span><br><span class="line"><span class="type">int</span> num;</span><br><span class="line"><span class="type">char</span> name[<span class="number">10</span>];<span class="comment">//8 byte</span></span><br><span class="line"><span class="type">int</span> com, math, english;</span><br><span class="line"><span class="type">double</span> average;<span class="comment">//8 byte</span></span><br><span class="line">&#125; stu;</span><br><span class="line">stu boy[<span class="number">1000</span>], * p;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(stu)&lt;&lt;<span class="string">&quot;\n&quot;</span>;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(<span class="type">int</span>);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>对齐数的大小，在vs编译器里，是数据类型大小和默认对齐数（vs是8）的最小值。</p><p>从第二个数据开始，数据首个字节的地址的偏移量要为对齐数的整数倍</p><p>对于数据类型stu，num先填充4 bytes，之后第二个char name[10]的对齐数是10和8的较小值，为8 bytes，首地址应为8的整数倍的偏移地址量，最小为8，所以从8开始存放name，</p><p>第三个数据还是int，现在已经填充了num，4个0xcc，name，加起来偏移地址为18，int对齐数是4，再填充两个0xcc，从偏移地址20开始填充三个int，20+12=32，</p><p>第四个数据是double，对齐数是其64位的大小，8bytes，32是8的整数倍，可以直接填入，加起来是40，所以sizeof(stu) 的大小是40</p><p><img src="/Images/430208b28b1148d99a4e0b1d209590c4.png" alt="430208b28b1148d99a4e0b1d209590c4"></p><p>数组的情况是同理的，把他看成几个连续的单个数据算就好了</p><h2 id="当结构体中有其他结构体"><a href="#当结构体中有其他结构体" class="headerlink" title="当结构体中有其他结构体"></a>当结构体中有其他结构体</h2><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">student</span> &#123;</span><br><span class="line"><span class="type">int</span> num;</span><br><span class="line"><span class="type">char</span> name[<span class="number">10</span>];<span class="comment">//8 byte</span></span><br><span class="line"><span class="type">int</span> com, math, english;</span><br><span class="line"><span class="type">double</span> average;<span class="comment">//8 byte</span></span><br><span class="line">&#125; stu;</span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">cls</span> &#123;</span><br><span class="line"><span class="type">int</span> class_number;</span><br><span class="line">stu one;</span><br><span class="line">&#125;;</span><br><span class="line">stu boy[<span class="number">1000</span>], * p;</span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(stu)&lt;&lt;<span class="string">&quot;\n&quot;</span>;</span><br><span class="line">std::cout &lt;&lt; <span class="built_in">sizeof</span>(cls);</span><br><span class="line"><span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>stu one 需要从其结构体内部数据的最大对齐数的整数倍的地址偏移量开始，这里内部最大是8，所以应该从cls里的地址偏移量为8开始存储，就是40+8=48。</p>]]></content>
+        <content type="html"><![CDATA[<h2 id="0x01-联合"><a href="#0x01-联合" class="headerlink" title="0x01 联合"></a>0x01 联合</h2><p>联合允许以多种类型来引用一个对象</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">union</span> <span class="title">U3</span>&#123;</span></span><br><span class="line"><span class="type">char</span> c;</span><br><span class="line">    <span class="type">int</span> i[<span class="number">2</span>];</span><br><span class="line">    <span class="type">double</span> v;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//三种数据结构仅能存储一种</span></span><br></pre></td></tr></table></figure><p>一个联合的总的大小等于它最大字段的大小</p><p>应用场景：</p><p>一个数据结构中的个不同字段的使用是互斥的，那么将这两个字段声明为联合的一部分 ，而不是结构的一部分，会减小分配空间的总量。</p><p>union还可以用来访问不同的数据类型的位模式，用一种数据类型才存储联合中的参数，又用另一种数据类型来访问它，除了有一样的位模式外，数值一般没有任何关联。</p><h2 id="0x02-数据对齐"><a href="#0x02-数据对齐" class="headerlink" title="0x02 数据对齐"></a>0x02 数据对齐</h2><p>许多计算机系统对基本数据类型的合法地址做出了 些限制，要求某种类型对象的地址必须是某个值 K( 通常是2，4或8) 的倍数。这种对齐限制简化了形成处理器和内存系统之间接口的硬件设计。</p><h3 id="对齐原则"><a href="#对齐原则" class="headerlink" title="对齐原则"></a>对齐原则</h3><p>对齐原则是任何K字节的基本对象的地址必须是K的倍数。</p><p><code>align 8</code>    </p><p>这段声明保证了它后面的数据的起始地址是8的倍数，常用于8字节数据类型的对齐。</p><h3 id="结构体"><a href="#结构体" class="headerlink" title="结构体"></a>结构体</h3><p>看下面的例子：</p><p>结构体的起始地址和其中的数据类型，一般要满足对齐（对齐大小一般最大的数据类型大小）。</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S1</span> &#123;</span> </span><br><span class="line"><span class="type">int</span> i; </span><br><span class="line"><span class="type">char</span> c; </span><br><span class="line"><span class="type">int</span> j; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p><img src="/Images/image-20240409180939599.png" alt="image-20240409180939599"></p><p>如图所示，蓝色部分为了满足对齐而被浪费了。</p><h3 id="结构体数组"><a href="#结构体数组" class="headerlink" title="结构体数组"></a>结构体数组</h3><p>结构的末尾有时候也需要填充，这样结构数组中的每个元素都会满足他们的对齐要求。</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">S2</span> &#123;</span> </span><br><span class="line"><span class="type">int</span> i; </span><br><span class="line"><span class="type">int</span> j; </span><br><span class="line"><span class="type">char</span> c; </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure><p><img src="/Images/image-20240409181218102.png" alt="image-20240409181218102"></p><p>只有在结构末尾填充，才能使得该结构体数组的每个结构的起始地址都是4的倍数。</p><h2 id="0x03-结构体内偏移和填充的具体分布"><a href="#0x03-结构体内偏移和填充的具体分布" class="headerlink" title="0x03 结构体内偏移和填充的具体分布"></a>0x03 结构体内偏移和填充的具体分布</h2><p>研究复杂结构体内部的填充是怎么进行的，可以参考<a href="https://www.beihaihaihai.top/2024/04/09/%E7%BB%93%E6%9E%84%E4%BD%93%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E7%9A%84%E6%89%80%E5%8D%A0%E5%AD%97%E8%8A%82%E9%95%BF%E5%BA%A6/">结构体数据类型的所占字节长度</a>。</p>]]></content>
       
       
       
@@ -391,6 +391,33 @@
     
     
     <entry>
+      <title>vector容器基础</title>
+      <link href="/2024/02/24/vector%E5%AE%B9%E5%99%A8/"/>
+      <url>/2024/02/24/vector%E5%AE%B9%E5%99%A8/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-vector构造函数"><a href="#0x01-vector构造函数" class="headerlink" title="0x01 vector构造函数"></a>0x01 vector构造函数</h2><p><img src="/Images/adfb98be36cf58f17c2a79b8087f429.png" alt="adfb98be36cf58f17c2a79b8087f429"></p><p>除了第一种，其他几种基本都是拷贝构造而来的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v</span>(<span class="number">10</span>,<span class="number">100</span>);</span><br><span class="line"><span class="comment">//压入10个100的int数</span></span><br></pre></td></tr></table></figure><p>拷贝构造函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v2</span>(v);</span><br><span class="line"><span class="comment">//拷贝了v的10个100</span></span><br></pre></td></tr></table></figure><h2 id="0x02-vector赋值操作"><a href="#0x02-vector赋值操作" class="headerlink" title="0x02 vector赋值操作"></a>0x02 vector赋值操作</h2><p><img src="/Images/image-20240219145512229.png" alt="image-20240219145512229"></p><p>第一种就是等号运算符重载，直接v1 = v2赋值就好了。</p><h2 id="0x03-vector容量和大小"><a href="#0x03-vector容量和大小" class="headerlink" title="0x03 vector容量和大小"></a>0x03 vector容量和大小</h2><p><img src="/Images/image-20240219153402588.png" alt="image-20240219153402588"></p><p>empty( )，若容量为空则返回true，不为空则返回false。</p><p>capacity( )是返回容器的容量的函数，容器的容量不小于容器中元素的个数（常识）。</p><p>resize函数能调整容器的大小（长度size，并非容量）。</p><p>resize函数若不指定填充的元素elem，则默认填充0。</p><h2 id="0x04-vector插入和删除"><a href="#0x04-vector插入和删除" class="headerlink" title="0x04 vector插入和删除"></a>0x04 vector插入和删除</h2><p><img src="/Images/image-20240219160518544.png" alt="image-20240219160518544"></p><p>这里重点记录一下迭代器修改元素的方法。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//迭代器插入法</span></span><br><span class="line">v1.<span class="built_in">insert</span>(v1.<span class="built_in">begin</span>(),<span class="number">100</span>);</span><br><span class="line"><span class="comment">//在v1.begin()的位置插入100，v1.begin()是指向首元的迭代器</span></span><br></pre></td></tr></table></figure><p>注意const_iterator pos 位置是传入迭代器就好了。</p><h2 id="0x05-vector数据存取"><a href="#0x05-vector数据存取" class="headerlink" title="0x05 vector数据存取"></a>0x05 vector数据存取</h2><p><img src="/Images/image-20240219161554444.png" alt="image-20240219161554444"></p><p>没啥好注意的，一般都用[ ]重载来访问</p><h2 id="0x06-vector互换容器"><a href="#0x06-vector互换容器" class="headerlink" title="0x06 vector互换容器"></a>0x06 vector互换容器</h2><p><img src="/Images/image-20240219161831638.png" alt="image-20240219161831638"></p><p>实现两个容器内元素进行互换。</p><p>巧用swap可以收缩内存空间。</p><p>实际情况：假设你定义了一个容量很大的容器时，若当你不需要使用这么大的容量时，通过resize函数只能改变容器的大小，而容量不会改变，这时候多余的容量就遭到了浪费。</p><p>比如你push_back了10000个数据，容量会给你自动扩展到约13000的数据，这时候你resize(3)，将容器的大小调整至3，这时候容量依然是13000左右。这会造成浪费！！！</p><p>解决方法，匿名函数和swap函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(v).<span class="built_in">swap</span>(v);</span><br></pre></td></tr></table></figure><p>vector<int>(v) 默认构造匿名对象。这里会根据v目前所用的元素个数的大小来初始化匿名对象，在这里的例子里，大小为3。</p><p>然后调用 .swap(v)，v的容量经过swap交换后是 3，大小（size）也是 3，不会造成空间浪费了，匿名对象的容量经过swap后占用很大，但是在这一行执行完后匿名对象会被销毁，就不会造成空间浪费了。</p><p><img src="/Images/image-20240219182013042.png" alt="image-20240219182013042"></p><h2 id="0x07-vector预留空间"><a href="#0x07-vector预留空间" class="headerlink" title="0x07 vector预留空间"></a>0x07 vector预留空间</h2><p><img src="/Images/image-20240219182129095.png" alt="image-20240219182129095"></p><p>预留空间是为了，减少vector在动态扩展容量时的扩展次数。</p><p>vector容器在创建的时候是会先预留较多的空间来应对之后的扩展，比如我push_back了10个数据，编译器会事先将这个vector容器的容量设定成100多（大概的，反正比容器大小，元素个数多）。当你继续扩展这个容器时，可能超过了事先预留好的容量，这时候编译器会将原先的容器内的数据拷贝到一个新的，容量更大的容器中，虽然容器的名字不会变，但是该容器的首地址会发生了改变（因为数据被拷贝存储到了一个新开辟的空间）。</p><p>经过浅显的测试，10000个数据在push_back时大约会发生30次的新开辟存储空间的情况，浪费了时间资源。</p><p>测试代码如下</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; v;</span><br><span class="line"><span class="comment">//统计开辟次数</span></span><br><span class="line"><span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++)&#123;</span><br><span class="line">    v.<span class="built_in">push_back</span>(i);</span><br><span class="line">    <span class="comment">//当每次开辟新空间时，v[0]的地址就会变化，以此为参照统计开辟次数</span></span><br><span class="line">    <span class="keyword">if</span>(p!= &amp;v[<span class="number">0</span>])&#123;</span><br><span class="line">        p = &amp;v[<span class="number">0</span>];</span><br><span class="line">        cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">cout &lt;&lt; cnt;</span><br></pre></td></tr></table></figure><p>所以一开始就先预留出容量，能减少扩展次数。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> C++ </tag>
+            
+            <tag> 进阶 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>线段树转载记录</title>
       <link href="/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/"/>
       <url>/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/</url>
@@ -414,33 +441,6 @@
             <tag> 算法 </tag>
             
             <tag> 数据结构 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>vector容器基础</title>
-      <link href="/2024/02/24/vector%E5%AE%B9%E5%99%A8/"/>
-      <url>/2024/02/24/vector%E5%AE%B9%E5%99%A8/</url>
-      
-        <content type="html"><![CDATA[<h2 id="0x01-vector构造函数"><a href="#0x01-vector构造函数" class="headerlink" title="0x01 vector构造函数"></a>0x01 vector构造函数</h2><p><img src="/Images/adfb98be36cf58f17c2a79b8087f429.png" alt="adfb98be36cf58f17c2a79b8087f429"></p><p>除了第一种，其他几种基本都是拷贝构造而来的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v</span>(<span class="number">10</span>,<span class="number">100</span>);</span><br><span class="line"><span class="comment">//压入10个100的int数</span></span><br></pre></td></tr></table></figure><p>拷贝构造函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v2</span>(v);</span><br><span class="line"><span class="comment">//拷贝了v的10个100</span></span><br></pre></td></tr></table></figure><h2 id="0x02-vector赋值操作"><a href="#0x02-vector赋值操作" class="headerlink" title="0x02 vector赋值操作"></a>0x02 vector赋值操作</h2><p><img src="/Images/image-20240219145512229.png" alt="image-20240219145512229"></p><p>第一种就是等号运算符重载，直接v1 = v2赋值就好了。</p><h2 id="0x03-vector容量和大小"><a href="#0x03-vector容量和大小" class="headerlink" title="0x03 vector容量和大小"></a>0x03 vector容量和大小</h2><p><img src="/Images/image-20240219153402588.png" alt="image-20240219153402588"></p><p>empty( )，若容量为空则返回true，不为空则返回false。</p><p>capacity( )是返回容器的容量的函数，容器的容量不小于容器中元素的个数（常识）。</p><p>resize函数能调整容器的大小（长度size，并非容量）。</p><p>resize函数若不指定填充的元素elem，则默认填充0。</p><h2 id="0x04-vector插入和删除"><a href="#0x04-vector插入和删除" class="headerlink" title="0x04 vector插入和删除"></a>0x04 vector插入和删除</h2><p><img src="/Images/image-20240219160518544.png" alt="image-20240219160518544"></p><p>这里重点记录一下迭代器修改元素的方法。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//迭代器插入法</span></span><br><span class="line">v1.<span class="built_in">insert</span>(v1.<span class="built_in">begin</span>(),<span class="number">100</span>);</span><br><span class="line"><span class="comment">//在v1.begin()的位置插入100，v1.begin()是指向首元的迭代器</span></span><br></pre></td></tr></table></figure><p>注意const_iterator pos 位置是传入迭代器就好了。</p><h2 id="0x05-vector数据存取"><a href="#0x05-vector数据存取" class="headerlink" title="0x05 vector数据存取"></a>0x05 vector数据存取</h2><p><img src="/Images/image-20240219161554444.png" alt="image-20240219161554444"></p><p>没啥好注意的，一般都用[ ]重载来访问</p><h2 id="0x06-vector互换容器"><a href="#0x06-vector互换容器" class="headerlink" title="0x06 vector互换容器"></a>0x06 vector互换容器</h2><p><img src="/Images/image-20240219161831638.png" alt="image-20240219161831638"></p><p>实现两个容器内元素进行互换。</p><p>巧用swap可以收缩内存空间。</p><p>实际情况：假设你定义了一个容量很大的容器时，若当你不需要使用这么大的容量时，通过resize函数只能改变容器的大小，而容量不会改变，这时候多余的容量就遭到了浪费。</p><p>比如你push_back了10000个数据，容量会给你自动扩展到约13000的数据，这时候你resize(3)，将容器的大小调整至3，这时候容量依然是13000左右。这会造成浪费！！！</p><p>解决方法，匿名函数和swap函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(v).<span class="built_in">swap</span>(v);</span><br></pre></td></tr></table></figure><p>vector<int>(v) 默认构造匿名对象。这里会根据v目前所用的元素个数的大小来初始化匿名对象，在这里的例子里，大小为3。</p><p>然后调用 .swap(v)，v的容量经过swap交换后是 3，大小（size）也是 3，不会造成空间浪费了，匿名对象的容量经过swap后占用很大，但是在这一行执行完后匿名对象会被销毁，就不会造成空间浪费了。</p><p><img src="/Images/image-20240219182013042.png" alt="image-20240219182013042"></p><h2 id="0x07-vector预留空间"><a href="#0x07-vector预留空间" class="headerlink" title="0x07 vector预留空间"></a>0x07 vector预留空间</h2><p><img src="/Images/image-20240219182129095.png" alt="image-20240219182129095"></p><p>预留空间是为了，减少vector在动态扩展容量时的扩展次数。</p><p>vector容器在创建的时候是会先预留较多的空间来应对之后的扩展，比如我push_back了10个数据，编译器会事先将这个vector容器的容量设定成100多（大概的，反正比容器大小，元素个数多）。当你继续扩展这个容器时，可能超过了事先预留好的容量，这时候编译器会将原先的容器内的数据拷贝到一个新的，容量更大的容器中，虽然容器的名字不会变，但是该容器的首地址会发生了改变（因为数据被拷贝存储到了一个新开辟的空间）。</p><p>经过浅显的测试，10000个数据在push_back时大约会发生30次的新开辟存储空间的情况，浪费了时间资源。</p><p>测试代码如下</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; v;</span><br><span class="line"><span class="comment">//统计开辟次数</span></span><br><span class="line"><span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++)&#123;</span><br><span class="line">    v.<span class="built_in">push_back</span>(i);</span><br><span class="line">    <span class="comment">//当每次开辟新空间时，v[0]的地址就会变化，以此为参照统计开辟次数</span></span><br><span class="line">    <span class="keyword">if</span>(p!= &amp;v[<span class="number">0</span>])&#123;</span><br><span class="line">        p = &amp;v[<span class="number">0</span>];</span><br><span class="line">        cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">cout &lt;&lt; cnt;</span><br></pre></td></tr></table></figure><p>所以一开始就先预留出容量，能减少扩展次数。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> C++ </tag>
-            
-            <tag> 进阶 </tag>
             
         </tags>
       
@@ -847,17 +847,6 @@
     
     
     <entry>
-      <title>游戏</title>
-      <link href="/games/index.html"/>
-      <url>/games/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>关于</title>
       <link href="/about/index.html"/>
       <url>/about/index.html</url>
@@ -892,17 +881,6 @@
     
     <entry>
       <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
-      
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
       <link href="/css/custom.css"/>
       <url>/css/custom.css</url>
       
@@ -913,11 +891,11 @@
     
     
     <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>游戏</title>
+      <link href="/games/index.html"/>
+      <url>/games/index.html</url>
       
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
       
     </entry>
     
@@ -935,9 +913,9 @@
     
     
     <entry>
-      <title>视频</title>
-      <link href="/movies/index.html"/>
-      <url>/movies/index.html</url>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -946,9 +924,31 @@
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title></title>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
+      
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>视频</title>
+      <link href="/movies/index.html"/>
+      <url>/movies/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
