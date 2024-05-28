@@ -1,0 +1,579 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>深大计系2实验三 | 北海の小站</title><meta name="author" content="BE1ha1"><meta name="copyright" content="BE1ha1"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="一、 实验目标：  理解程序函数调用中参数传递机制； 掌握缓冲区溢出攻击方法； 进一步熟练掌握GDB调试工具和objdump反汇编工具。  二、实验环境：  计算机（Intel CPU） Linux 64位操作系统 GDB调试工具 objdump反汇编工具  三、实验内容 本实验设计为一个黑客利用缓冲区溢出技术进行攻击的游戏。我们仅给黑客（同学）提供一个二进制可执行文件bufbomb和部分函数的C">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深大计系2实验三">
+<meta property="og:url" content="https://www.beihaihaihai.top/2024/05/28/%E6%B7%B1%E5%A4%A7%E7%BC%93%E5%86%B2%E5%8C%BA%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/index.html">
+<meta property="og:site_name" content="北海の小站">
+<meta property="og:description" content="一、 实验目标：  理解程序函数调用中参数传递机制； 掌握缓冲区溢出攻击方法； 进一步熟练掌握GDB调试工具和objdump反汇编工具。  二、实验环境：  计算机（Intel CPU） Linux 64位操作系统 GDB调试工具 objdump反汇编工具  三、实验内容 本实验设计为一个黑客利用缓冲区溢出技术进行攻击的游戏。我们仅给黑客（同学）提供一个二进制可执行文件bufbomb和部分函数的C">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://my-own-pic-bed.pages.dev/img/16.png">
+<meta property="article:published_time" content="2024-05-28T11:22:00.000Z">
+<meta property="article:modified_time" content="2024-05-28T05:55:37.161Z">
+<meta property="article:author" content="BE1ha1">
+<meta property="article:tag" content="基础">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://my-own-pic-bed.pages.dev/img/16.png"><link rel="shortcut icon" href="/img/tubiao.jpg"><link rel="canonical" href="https://www.beihaihaihai.top/2024/05/28/%E6%B7%B1%E5%A4%A7%E7%BC%93%E5%86%B2%E5%8C%BA%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":230},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '深大计系2实验三',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2024-05-28 13:55:37'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="/css/universe.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.css" /><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiperstyle.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-footer-beautify@1.0.0/lib/runtime.css" media="print" onload="this.media='all'"><!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/xiang.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">41</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 档案</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 视频</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-video"></i><span> 游戏</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://my-own-pic-bed.pages.dev/img/16.png')"><nav id="nav"><span id="blog-info"><a href="/" title="北海の小站"><span class="site-name">北海の小站</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 档案</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 视频</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-video"></i><span> 游戏</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">深大计系2实验三</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-05-28T11:22:00.000Z" title="发表于 2024-05-28 19:22:00">2024-05-28</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-05-28T05:55:37.161Z" title="更新于 2024-05-28 13:55:37">2024-05-28</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>7分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="深大计系2实验三"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p><strong>一、</strong> <strong>实验目标：</strong></p>
+<ol>
+<li>理解程序函数调用中参数传递机制；</li>
+<li>掌握缓冲区溢出攻击方法；</li>
+<li>进一步熟练掌握GDB调试工具和objdump反汇编工具。</li>
+</ol>
+<p><strong>二、实验环境：</strong></p>
+<ol>
+<li>计算机（Intel CPU）</li>
+<li>Linux 64位操作系统</li>
+<li>GDB调试工具</li>
+<li>objdump反汇编工具</li>
+</ol>
+<p><strong>三、实验内容</strong></p>
+<p>本实验设计为一个黑客利用缓冲区溢出技术进行攻击的游戏。我们仅给黑客（同学）提供一个二进制可执行文件bufbomb和部分函数的C代码，不提供每个关卡的源代码。程序运行中有3个关卡，每个关卡需要用户输入正确的缓冲区内容，否则无法通过管卡！</p>
+<p>要求同学查看各关卡的要求，运用<strong><em>\</em>GDB调试工具和objdump反汇编工具**</strong>，通过分析汇编代码和相应的栈帧结构，通过缓冲区溢出办法在执行了getbuf()函数返回时作攻击，使之返回到各关卡要求的指定函数中。第一关只需要返回到指定函数，第二关不仅返回到指定函数还需要为该指定函数准备好参数，最后一关要求在返回到指定函数之前执行一段汇编代码完成全局变量的修改。</p>
+<p>实验代码bufbomb和相关工具（sendstring/makecookie）的更详细内容请参考“实验四 缓冲区溢出攻击实验.pptx”。</p>
+<p>本实验要求解决关卡1、2、3，给出实验思路，通过截图把实验过程和结果写在实验报告上。</p>
+<p><strong>四、实验步骤和结果</strong></p>
+<p><strong>因为本次实验用到的可执行文件是</strong>32位，而实验环境是64位的，需要先安装一个32位的库</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">objdump -d bufbomb &gt;&gt; 1.txt</span><br></pre></td></tr></table></figure>
+<p>首先利用反汇编命令查看getbuf函数的汇编代码，以便分析getbuf在调用<Gets>时的栈帧结构</p>
+<p><strong>步骤1</strong> <strong>返回到**</strong>smoke()**</p>
+<p><strong>解题思路</strong></p>
+<p>本实验中，bufbomb中的test()函数将会调用getbuf()函数，getbuf()函数再调用gets()从标准输入设备读入字符串。</p>
+<p>系统函数gets()未进行缓冲区溢出保护。其代码如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">getbuf</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> buf[<span class="number">12</span>];</span><br><span class="line">    Gets(buf);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们的目标是使getbuf()返回时，不返回到test()，而是直接返回到指定的smoke()函数。</p>
+<p>为此，我们可以通过构造并输入大于getbuf()中给出的数据缓冲区的字符串而破坏getbuf()的栈帧，替换其返回地址，将返回地址改成smoke()函数的地址。</p>
+<p><strong>解题过程</strong></p>
+<p>分析getbuf()函数的汇编代码，可以发现，getbuf()在保存%ebp的旧值后，将%ebp指向%esp所指的位置，然后将栈指针减去0x28来分配额外的20个字节的地址空间。字符数组buf的位置用%ebp下0x18(即24)个字节来计算。然后调用Gets（）函数，读取的字符串返回到%ebp-0x18，即%ebp-24。</p>
+<p><strong>具体的栈帧结构如下：</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><strong>栈帧</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>返回地址</td>
+<td>属于调用者的栈帧</td>
+</tr>
+<tr>
+<td>保存的%ebp旧值</td>
+<td>%ebp</td>
+</tr>
+<tr>
+<td>20-23</td>
+<td></td>
+</tr>
+<tr>
+<td>16-19</td>
+<td></td>
+</tr>
+<tr>
+<td>12-15</td>
+<td></td>
+</tr>
+<tr>
+<td>[11]  [10] [9] [8]</td>
+<td></td>
+</tr>
+<tr>
+<td>[7]  [6]  [5]  [4]</td>
+<td></td>
+</tr>
+<tr>
+<td>[3]  [2]  [1]  [0]</td>
+<td>buf,%ebp-0x18</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>%esp，%ebp-0x24</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>从以上分析可得，只要输入不超过11个字符，gets返回的字符串（包括末尾的null）就能够放进buf分配的空间里。长一些的字符串就会导致gets覆盖栈上存储的某些信息。</p>
+<p>随着字符串变长，下面的信息会被破坏：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><strong>输入的字符数量</strong></th>
+<th><strong>附加的被破坏的状态</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>0-11</strong></td>
+<td><strong>无</strong></td>
+</tr>
+<tr>
+<td><strong>12-23</strong></td>
+<td><strong>分配后未使用的空间</strong></td>
+</tr>
+<tr>
+<td><strong>24-27</strong></td>
+<td><strong>保存的%ebp旧值</strong></td>
+</tr>
+<tr>
+<td><strong>28-31</strong></td>
+<td><strong>返回地址</strong></td>
+</tr>
+<tr>
+<td><strong>32+</strong></td>
+<td><strong>调用者test()中保存的状态</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>因此，我们要替换返回地址，需要构造一个长度至少为32的字符串，其中的第0~11个字符放进buf分配的空间里，第12~23个字符放进程序分配后未使用的空间里，第24~27个字符覆盖保存的%ebp旧值，第28-31个字符覆盖返回地址。</p>
+<p>由于替换掉返回地址后，getbuf()函数将不会再返回到test()中，所以覆盖掉test()的%ebp旧值并不会有什么影响。也就是说我们构造的长度为32的字符串前28个字符随便是啥都行，而后面四个字符就必须能表示smoke()函数的地址。所以我们要构造的字符串就是“28个任意字符+smoke()地址”。任意的28个字符都用十六进制数00填充就行。</p>
+<p><strong>最终结果截图</strong></p>
+<p>通过在0.txt中传入以下数据</p>
+<p>00112233445566778899001122334455667788990011223344556677b08e0408</p>
+<p>成功通过栈溢出改变了返回地址，调用了smoke( )函数</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/image-20240528134901835.png" alt="image-20240528134901835"></p>
+<p><strong>步骤2</strong> <strong>返回到fizz()并准备相应参数</strong></p>
+<p><strong>2.1</strong> <strong>解题思路</strong></p>
+<p>这一关要求返回到fizz()并传入自己的cookie值作为参数，破解的思路和第一关是类似的，构造一个超过缓冲区长度的字符串将返回地址替换成fizz()的地址，只是增加了一个传入参数，所以在读入字符串时，要把fizz()函数读取参数的地址替换成自己的cookie值，具体细节见解题过程。</p>
+<p><strong>2.2</strong> <strong>解题过程</strong></p>
+<p>首先还是利用objdunp查看并分析fizz()函数的汇编代码</p>
+<p>从汇编代码可知，fizz()函数被调用时首先保存%ebp旧值并分配新的空间，然后读取%ebp-0x8地址处的内容作为传入的参数，要求传入的参数是自己的cookie值。也就是说传入的参数其实是存在%ebp-0x8处的，具体的栈帧结构如下：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><strong>栈帧</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>传入的参数</td>
+<td>%ebp+0x8</td>
+</tr>
+<tr>
+<td></td>
+<td>%ebp+0x4</td>
+</tr>
+<tr>
+<td>保存的%ebp旧值</td>
+<td>%ebp</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>%esp</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>对应到getbuf()函数中的栈帧结构如下：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th><strong>栈帧</strong></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td>需要替换成cookie传入fizz()</td>
+</tr>
+<tr>
+<td></td>
+<td>任意替换</td>
+</tr>
+<tr>
+<td>返回地址</td>
+<td>属于调用者的栈帧</td>
+</tr>
+<tr>
+<td>保存的%ebp旧值</td>
+<td>%ebp，需要替换成fizz()的地址</td>
+</tr>
+<tr>
+<td></td>
+<td>任意替换</td>
+</tr>
+<tr>
+<td></td>
+<td>任意替换</td>
+</tr>
+<tr>
+<td></td>
+<td>任意替换</td>
+</tr>
+<tr>
+<td>[11]  [10]  [9]  [8]</td>
+<td></td>
+</tr>
+<tr>
+<td>[7]  [6]  [5]  [4]</td>
+<td></td>
+</tr>
+<tr>
+<td>[3 ] [2] [1] [0]</td>
+<td>buf,%ebp-0x18</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td>%esp，%ebp-0x24</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>由以上结构不难判断出，我们需要读入buf的字符串为“28个任意字符+fizz()的地址+4个任意的字符+自己的cookie值”，每个字符还是用十六进制数表示。</p>
+<p><strong>2.3</strong> <strong>最终结果截图</strong></p>
+<p>输入</p>
+<p>00112233445566778899001122334455667788990011223344556677608e0408001122330032ae6d</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/Images/wps1-1716875420723-1.jpg" alt="img"> </p>
+<p><strong>步骤3</strong> <strong>返回到bang()且修改global_value</strong></p>
+<p><strong>解题思路</strong></p>
+<p>这一关要求先修改全局变量global_value的值为自己的cookie值，再返回到band()。为此需要先编写一段代码，在代码中把global_value的值改为自己的cookie后返回到band()函数。将这段代码通过GCC产生目标文件后读入到buf数组中，并使getbuf函数的返回到buf数组的地址，这样程序就会执行我们写的代码，修改global_value的值并调用band()函数。具体细节见解题过程。</p>
+<p><strong>解题过程</strong></p>
+<p>首先，为了能精确地指定跳转地址，先在root权限下关闭Linux的内存地址随机化：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo su</span><br><span class="line">sysctl -w kernel.randomize_va_space=0</span><br><span class="line">su beihai</span><br></pre></td></tr></table></figure>
+<p>用objdump查看bang()函数的汇编代码如下：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/Images/wps2.jpg" alt="img"> </p>
+<p>很明显，bang()函数首先读取0x804a1c4和0x804a1d4的地址的内容并进行比较，要求两个地址中的内容相同：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/Images/wps3.jpg" alt="img"> </p>
+<p>​    用gdb调试命令查看：</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/Images/wps4.jpg" alt="img"> </p>
+<p>可以发现，0x804a1c4就是全局变量global_value的地址，0x804a1d4是cookie的地址。因此，我们只要在自己写的代码中，把地址0x804a1d4的内容存到地址0x804a1c4就行了。</p>
+<p>再利用objdump得到bang()函数的入口地址为0x08048e10:</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/Images/wps5.jpg" alt="img"> </p>
+<p>到这里，就可以确定我们自己写的代码要干的事情了。首先是将global_value的值设置为cookie的值，也就是将0x804a1c4的值设置为0x804a1d4的值，然后将bang()函数的入口地址0x08048e10压入栈中，这样当函数返回的时候，就会直接取栈顶作为返回地址，从而调用bang()函数。接着函数返回，此时返回的地址就是上一条语句中压入栈中的地址，也就是bang()函数的入口地址了。</p>
+<p>根据上述思路，可以写出以下代码来调用bang( )函数</p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/Images/wps6.jpg" alt="img"> </p>
+<p>以上代码是在编译再反编译呈现出来的，复制代码的十六进制表示，填入0.txt的输入文件中，由于getbuf( )函数里从ebp-0x18位置开始读取字符串，经过计算后，这里的20字节的代码，再加上8字节的占用字符串，然后就可以填入4字节的返回地址，返回地址则填入buf数组的首地址，用来调用buf数组里的，上述自己写的可执行代码，代码执行完后自然会返回到bang( )</p>
+<p>0.txt中填入：</p>
+<p>8b1425d4a10408891425c4a1040868108e0408c31122334455667788c0b1ffff</p>
+<p>最后四个字节是栈帧地址，每个用户都是不同的。</p>
+<p> <strong>最终结果截图</strong></p>
+<p><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/Images/wps7.jpg" alt="img"></p>
+<p><strong>五、实验总结与体会</strong></p>
+<p><strong>通过这次实验我收获了以下几点：</strong></p>
+<p>1、<strong>进一步掌握objdump反汇编和gdb调试，学会还原栈帧和分析运行时栈的组成。</strong></p>
+<p>2、<strong>学会了如何通过栈溢出来实现非法的函数调用，学会了如何防止此类栈溢出造成的安全隐患问题。</strong></p>
+<p>3、<strong>学会分析全局变量和在栈溢出中用十六进制传入自己写的代码。</strong></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://www.beihaihaihai.top">BE1ha1</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://www.beihaihaihai.top/2024/05/28/%E6%B7%B1%E5%A4%A7%E7%BC%93%E5%86%B2%E5%8C%BA%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/">https://www.beihaihaihai.top/2024/05/28/%E6%B7%B1%E5%A4%A7%E7%BC%93%E5%86%B2%E5%8C%BA%E6%A0%88%E6%BA%A2%E5%87%BA%E5%AE%9E%E9%AA%8C%E6%8A%A5%E5%91%8A/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.beihaihaihai.top" target="_blank">北海の小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%9F%BA%E7%A1%80/">基础</a></div><div class="post_share"><div class="social-share" data-image="https://my-own-pic-bed.pages.dev/img/16.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2024/05/27/IDA%E9%87%8C%E7%9A%84%E5%AE%8F/" title="IDA里反编译后出现的宏"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/56.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">IDA里反编译后出现的宏</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/01/30/C-%E7%BB%A7%E6%89%BF/" title="C++继承"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/xiang3.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-30</div><div class="title">C++继承</div></div></a></div><div><a href="/2024/04/12/GDB%E8%B0%83%E8%AF%95%E5%91%BD%E4%BB%A4/" title="GDB调试命令"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/yihua1.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-12</div><div class="title">GDB调试命令</div></div></a></div><div><a href="/2024/05/01/DontEatMe/" title="【buuctf】DontEatMe"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/rlj.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-01</div><div class="title">【buuctf】DontEatMe</div></div></a></div><div><a href="/2024/01/29/GeekChallenge/" title="GeekChallenge 2023 re wp"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/liya.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-29</div><div class="title">GeekChallenge 2023 re wp</div></div></a></div><div><a href="/2024/05/27/IDA%E9%87%8C%E7%9A%84%E5%AE%8F/" title="IDA里反编译后出现的宏"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/56.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-27</div><div class="title">IDA里反编译后出现的宏</div></div></a></div><div><a href="/2024/04/25/LC-3-%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%E5%AE%9E%E9%AA%8C1%E6%B1%82%E6%88%90%E7%BB%A9%E7%AD%89%E7%BA%A7/" title="LC-3 汇编语言实验1求成绩等级"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/28.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-25</div><div class="title">LC-3 汇编语言实验1求成绩等级</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/xiang.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">BE1ha1</div><div class="author-info__description">这里是幻想乡~</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">41</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">21</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/beihaihaihai"><i class="fab fa-github"></i><span>由此进入幻想乡</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/beihaihaihai" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:283829027@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">弓马齐射洒热血，突破重围显英豪！</div></div><div class="sticky_layout"></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By BE1ha1</div><div class="footer_custom_text">May all the beauty be blessed</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="/js/tw_cn.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.5/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script></div><canvas id="universe"></canvas><script defer src="/js/universe.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.12.0"></script></div></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 380px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 320px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(/img/xiang2.png);"> <a class="categoryBar-list-link" href="categories/C/">C++</a><span class="categoryBar-list-count">9</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/ao3.png);"> <a class="categoryBar-list-link" href="categories/Re-wp/">Re-wp</a><span class="categoryBar-list-count">9</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/umi11.png);"> <a class="categoryBar-list-link" href="categories/数据结构/">数据结构</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/yuanshen1.jpg);"> <a class="categoryBar-list-link" href="categories/刷题/">刷题</a><span class="categoryBar-list-count">2</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/arti1.jpg);"> <a class="categoryBar-list-link" href="categories/math/">math</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><script data-pjax>
+  function butterfly_clock_anzhiyu_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock_anzhiyu')
+    if(parent_div_git) {
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = '/';
+  var qweather_key = 'b16a1fa0e63c46a4b8f28abfb06ae3fe';
+  var gaud_map_key = 'e2b04289e870b005374ee030148d64fd&s=rsv3';
+  var baidu_ak_key = 'undefined';
+  var flag = 0;
+  var clock_rectangle = '113.34532,23.15624';
+  var clock_default_rectangle_enable = 'false';
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  </script><script src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script><script data-pjax src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.js"></script><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/02/14/hagme-week2/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/yihua1.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-02-14</span><a class="blog-slider__title" href="2024/02/14/hagme-week2/" alt="">hgame_wp</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/02/14/hagme-week2/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/02/06/beingCTF-WP/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/rinai2.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-02-06</span><a class="blog-slider__title" href="2024/02/06/beingCTF-WP/" alt="">beginCTF</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/02/06/beingCTF-WP/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/02/19/VNCTF的签到题/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/mali1.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-02-19</span><a class="blog-slider__title" href="2024/02/19/VNCTF的签到题/" alt="">VNCTF2024</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/02/19/VNCTF的签到题/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/01/29/GeekChallenge/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/liya.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-01-29</span><a class="blog-slider__title" href="2024/01/29/GeekChallenge/" alt="">GeekChallenge 2023 re wp</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/01/29/GeekChallenge/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/01/29/nbctf/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/yuanshen2.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-01-29</span><a class="blog-slider__title" href="2024/01/29/nbctf/" alt="">nbctf</a><div class="blog-slider__text">又一篇逆向wp</div><a class="blog-slider__button" href="2024/01/29/nbctf/" alt="">详情   </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.js"></script><script defer data-pjax src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper_init.js"></script><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v6.2.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="主题版本Butterfly_v4.3.1" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://vercel.com/" style="margin-inline:5px" data-title="本站采用多线部署，主线路托管于Vercel" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-Vercel-brightgreen?style=flat&amp;logo=Vercel" alt=""/></a><a class="github-badge" target="_blank" href="https://dashboard.4everland.org/" style="margin-inline:5px" data-title="本站采用多线部署，备用线路托管于4EVERLAND" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-4EVERLAND-22DDDD?style=flat&amp;logo=IPFS" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px" data-title="本站项目由Github托管" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub" alt=""/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&amp;logo=Claris" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="/js/runtime.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body></html>
