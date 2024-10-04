@@ -1,0 +1,512 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>爬虫理论笔记 | 北海の小站</title><meta name="author" content="BE1ha1"><meta name="copyright" content="BE1ha1"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="web请求过程剖析服务器渲染服务器直接整合数据和html文件，并返回 客户端渲染服务器先返回一个html骨架，之后请求再次返回需要的数据，在浏览器客户端整合成页面（页面源代码没有数据）。 通过Network实时查看服务器对请求的返回，可以抓包到数据。 HTTP协议HTTP协议，Hyper Text Transfer Protocol（超文本传输协议），服务器和浏览器之间的数据交互遵守的就是HTTP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="爬虫理论笔记">
+<meta property="og:url" content="https://www.beihaihaihai.top/2024/10/04/%E7%88%AC%E8%99%AB/index.html">
+<meta property="og:site_name" content="北海の小站">
+<meta property="og:description" content="web请求过程剖析服务器渲染服务器直接整合数据和html文件，并返回 客户端渲染服务器先返回一个html骨架，之后请求再次返回需要的数据，在浏览器客户端整合成页面（页面源代码没有数据）。 通过Network实时查看服务器对请求的返回，可以抓包到数据。 HTTP协议HTTP协议，Hyper Text Transfer Protocol（超文本传输协议），服务器和浏览器之间的数据交互遵守的就是HTTP">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://my-own-pic-bed.pages.dev/img/28.png">
+<meta property="article:published_time" content="2024-10-04T13:51:00.000Z">
+<meta property="article:modified_time" content="2024-10-04T11:06:41.413Z">
+<meta property="article:author" content="BE1ha1">
+<meta property="article:tag" content="基础">
+<meta property="article:tag" content="爬虫">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://my-own-pic-bed.pages.dev/img/28.png"><link rel="shortcut icon" href="/img/tubiao.jpg"><link rel="canonical" href="https://www.beihaihaihai.top/2024/10/04/%E7%88%AC%E8%99%AB/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=4.12.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: {"defaultEncoding":2,"translateDelay":0,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"简"},
+  noticeOutdate: {"limitDay":365,"position":"top","messagePrev":"It has been","messageNext":"days since the last update, the content of the article may be outdated."},
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":230},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: true,
+    post: true
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"你已切换为繁体中文","cht_to_chs":"你已切换为简体中文","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#1f1f1f","position":"top-right"},
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.11.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyload: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '爬虫理论笔记',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2024-10-04 19:06:41'
+}</script><script>(win=>{
+      win.saveToLocal = {
+        set: (key, value, ttl) => {
+          if (ttl === 0) return
+          const now = Date.now()
+          const expiry = now + ttl * 86400000
+          const item = {
+            value,
+            expiry
+          }
+          localStorage.setItem(key, JSON.stringify(item))
+        },
+      
+        get: key => {
+          const itemStr = localStorage.getItem(key)
+      
+          if (!itemStr) {
+            return undefined
+          }
+          const item = JSON.parse(itemStr)
+          const now = Date.now()
+      
+          if (now > item.expiry) {
+            localStorage.removeItem(key)
+            return undefined
+          }
+          return item.value
+        }
+      }
+    
+      win.getScript = (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        script.onerror = reject
+        script.onload = script.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          script.onload = script.onreadystatechange = null
+          resolve()
+        }
+
+        Object.keys(attr).forEach(key => {
+          script.setAttribute(key, attr[key])
+        })
+
+        document.head.appendChild(script)
+      })
+    
+      win.getCSS = (url, id = false) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onerror = reject
+        link.onload = link.onreadystatechange = function() {
+          const loadState = this.readyState
+          if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+          link.onload = link.onreadystatechange = null
+          resolve()
+        }
+        document.head.appendChild(link)
+      })
+    
+      win.activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', 'ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          const now = new Date()
+          const hour = now.getHours()
+          const isNight = hour <= 6 || hour >= 18
+          if (t === undefined) isNight ? activateDarkMode() : activateLightMode()
+          else if (t === 'light') activateLightMode()
+          else activateDarkMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+      const detectApple = () => {
+        if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+          document.documentElement.classList.add('apple')
+        }
+      }
+      detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="/css/universe.css"><!-- hexo injector head_end start --><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-categories-card@1.0.0/lib/categorybar.css"><link rel="stylesheet" href="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.css" /><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiperstyle.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://npm.elemecdn.com/hexo-butterfly-footer-beautify@1.0.0/lib/runtime.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Zfour/Butterfly-double-row-display@1.00/cardlistpost.min.css"/>
+<style>#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags:before {content:"\A";
+  white-space: pre;}#recent-posts > .recent-post-item >.recent-post-info > .article-meta-wrap > .tags > .article-meta__separator{display:none}</style>
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/xiang.jpg" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">27</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 档案</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 视频</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-video"></i><span> 游戏</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://my-own-pic-bed.pages.dev/img/28.png')"><nav id="nav"><span id="blog-info"><a href="/" title="北海の小站"><span class="site-name">北海の小站</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 档案</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page group hide" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> 列表</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> 音乐</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> 视频</span></a></li><li><a class="site-page child" href="/games/"><i class="fa-fw fas fa-video"></i><span> 游戏</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/comments"><i class="fa-fw fas fa-envelope-open"></i><span> 留言板</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> 友链</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> 关于</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">爬虫理论笔记</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2024-10-04T13:51:00.000Z" title="发表于 2024-10-04 21:51:00">2024-10-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2024-10-04T11:06:41.413Z" title="更新于 2024-10-04 19:06:41">2024-10-04</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">4.9k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>18分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="爬虫理论笔记"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="web请求过程剖析"><a href="#web请求过程剖析" class="headerlink" title="web请求过程剖析"></a>web请求过程剖析</h2><h3 id="服务器渲染"><a href="#服务器渲染" class="headerlink" title="服务器渲染"></a>服务器渲染</h3><p>服务器直接整合数据和html文件，并返回</p>
+<h3 id="客户端渲染"><a href="#客户端渲染" class="headerlink" title="客户端渲染"></a>客户端渲染</h3><p>服务器先返回一个html骨架，之后请求再次返回需要的数据，在浏览器客户端整合成页面（页面源代码没有数据）。</p>
+<p>通过Network实时查看服务器对请求的返回，可以抓包到数据。</p>
+<h2 id="HTTP协议"><a href="#HTTP协议" class="headerlink" title="HTTP协议"></a>HTTP协议</h2><p>HTTP协议，Hyper Text Transfer Protocol（超文本传输协议），服务器和浏览器之间的数据交互遵守的就是HTTP协议。</p>
+<p>请求：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">请求行 -&gt; 请求方式（get/post）  请求URL地址   协议</span><br><span class="line">请求头 -&gt; 服务器要使用的附加信息</span><br><span class="line">请求体 -&gt; 一般是请求参数（例如搜索框输入的东西）</span><br></pre></td></tr></table></figure>
+<p>响应：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">状态行 -&gt; 协议 状态码（404等）</span><br><span class="line">响应头 -&gt; 放一些客户端要使用的附加信息（例如安全密钥，加密数据等）</span><br><span class="line">响应体 -&gt; 服务器返回的真正的客户端要使用的内容（HTML, json等）</span><br></pre></td></tr></table></figure>
+<p>请求头中的常见重要内容：</p>
+<p> 1、<code>User-Agent</code>：请求载体的身份标识（用什么发送的请求）</p>
+<p>2、<code>Referer</code>：防盗链（ 这次请求是从哪个页面来的？反爬使用）</p>
+<p>3、<code>cookie</code>：本地字符串数据信息（用户登录信息，反爬的token）</p>
+<p>响应头的重要内容：</p>
+<p>1、<code>cookie</code>：本地字符串数据信息（用户登录信息，反爬的token）</p>
+<p>2、<code>token</code>字样的各种反爬和反攻击的字符串</p>
+<p>请求方式：</p>
+<p>1、<code>GET</code>：显示提交</p>
+<p>2、<code>POST</code>：隐式提交</p>
+<h2 id="Requests"><a href="#Requests" class="headerlink" title="Requests"></a>Requests</h2><p>用requests发送请求，用GET的方式发送请求。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> requests</span><br><span class="line">resp = requests.get(Url)</span><br></pre></td></tr></table></figure>
+<p>关于User-Agent的反爬：</p>
+<p>有时候网页服务器会检测你的身份标识（User-Agent）,来判断你是正常浏览器访问还是通过爬虫手段。可以先正常访问一下浏览器，然后复制正常访问时的身份标识，创建一个字典来伪造身份</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">headers = &#123;</span><br><span class="line">			<span class="string">&quot;User-Agent&quot;</span>: <span class="string">&quot;your message&quot;</span></span><br><span class="line">			&#125;</span><br></pre></td></tr></table></figure>
+<p> 这个信息可以通过，检查 -&gt; 网络  -&gt; 查看发送成功的请求，然后查看他的请求头，里面有你的User-Agent信息。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">resp = requests.get(Url, headers = headers)</span><br></pre></td></tr></table></figure>
+<p>获取后直接进行替换headers。 </p>
+<h3 id="指定字符集"><a href="#指定字符集" class="headerlink" title="指定字符集"></a>指定字符集</h3><p>request模块默认的编码字符集是UTF-8，对于有些用GBK编码的网站，爬出数据后可能会是乱码，我们可以更改指定的编码字符集：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#resp = requests.get(URL)</span></span><br><span class="line">resp.encoding = <span class="string">&quot;GBK&quot;</span></span><br></pre></td></tr></table></figure>
+<h3 id="案例：百度搜索框搜索"><a href="#案例：百度搜索框搜索" class="headerlink" title="案例：百度搜索框搜索"></a>案例：百度搜索框搜索</h3><p>通过百度等搜索引擎搜索，发送的请求基本都是GET（查看页面请求头可知），那只要在程序中发送GET请求就好了。实现过于简单不赘叙。</p>
+<h3 id="案例：百度翻译单词"><a href="#案例：百度翻译单词" class="headerlink" title="案例：百度翻译单词"></a>案例：百度翻译单词</h3><p>通过请求调试发现，百度翻译的数据结果来源于sug页面，在Payload的data项下可以看到请求的内容，比如我输入一个dog，data下就会出现kw ： dog，这个kw就是keyword。</p>
+<p>所以通过修改sug的kw，然后来进行翻译内容爬取：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">url = <span class="string">&quot;https://fanyi.baidu.com/sug&quot;</span></span><br><span class="line">data = &#123;</span><br><span class="line">	<span class="string">&quot;kw&quot;</span> : <span class="string">&quot;dog&quot;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#发送post请求，发送的数据必须存放在字典里，通过data参数进行传递</span></span><br><span class="line">resp = requests.post(url, data = data)</span><br><span class="line"><span class="built_in">print</span>(resp.json()) <span class="comment">#将服务器放回的内容直接处理成json</span></span><br></pre></td></tr></table></figure>
+<h3 id="案例：豆瓣电影排行榜"><a href="#案例：豆瓣电影排行榜" class="headerlink" title="案例：豆瓣电影排行榜"></a>案例：豆瓣电影排行榜</h3><p>电影排行榜的渲染，属于上述的客户端渲染，html框架和数据是分开响应的（框架一般不变而排行榜内容可能会变），此时我们需要的电影数据就不是从网页源代码中寻找。</p>
+<p>通过抓包，筛选出XHR格式的响应，里面存储着用于和html框架整合的数据。</p>
+<p>一个URL中，问号分割网址和参数，问号后面的是参数类型及其数值。在写程序时，对于较长的URL，可以通过重新封装参数来分离参数和网址地址。</p>
+<p>（这里放一张图片）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">URL = <span class="string">&quot;your website&quot;</span></span><br><span class="line"><span class="comment">#重新封装参数</span></span><br><span class="line">param = &#123;</span><br><span class="line">    <span class="comment">#参数</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">#独属于get请求的，发送参数的选项是params，不同于POST请求的data</span></span><br><span class="line">resp = requests.get(url = url, params = param)</span><br></pre></td></tr></table></figure>
+<p>补充：记得在完成请求和响应后，在程序的最后，关掉responds，防止过多的请求挂载着，使得访问服务器堵塞：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">resp.close()</span><br></pre></td></tr></table></figure>
+<h2 id="正则匹配Re模块"><a href="#正则匹配Re模块" class="headerlink" title="正则匹配Re模块"></a>正则匹配Re模块</h2><h3 id="正则库re"><a href="#正则库re" class="headerlink" title="正则库re"></a>正则库re</h3><p>运用python自带的正则库</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br></pre></td></tr></table></figure>
+<p>设置一个匹配对象，<strong>预加载正则表达式</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">member = re.<span class="built_in">compile</span>(<span class="string">&quot; &quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>在单引号内写正则表达式。</p>
+<p>还可以传入第二个参数，用来指定额外的条件。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">member = re.<span class="built_in">compile</span>(<span class="string">r&#x27;&#x27;</span>, re.I)  <span class="comment">#忽略大小写</span></span><br><span class="line">member = re.<span class="built_in">compile</span>(<span class="string">&#x27;.*?&#x27;</span>, re.DOTALL) <span class="comment">#句点匹配符匹配换行符，或者用re.S</span></span><br><span class="line">member = re.<span class="built_in">compile</span>(<span class="string">&#x27;.*?&#x27;</span>, re.VERBOSE) <span class="comment">#忽略正则表达式字符串中的空白符和注释</span></span><br></pre></td></tr></table></figure>
+<h3 id="有关正则的python方法"><a href="#有关正则的python方法" class="headerlink" title="有关正则的python方法"></a>有关正则的python方法</h3><p><code>search()</code></p>
+<p>找到第一个匹配的字符串并返回一个Match对象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">member = re.<span class="built_in">compile</span>(<span class="string">r&#x27;123&#x27;</span>)</span><br><span class="line">mo = member.search(<span class="string">&#x27;123456&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(mo.group())</span><br><span class="line"><span class="comment">#123</span></span><br></pre></td></tr></table></figure>
+<p><code>match</code></p>
+<p>从头开始匹配，类似于正则表达式开头的^。</p>
+<p><code>findall()</code></p>
+<p>找到所有匹配的字符串并返回一个列表</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">member = re.<span class="built_in">compile</span>(<span class="string">r&#x27;\d\d\d-\d\d\d-\d\d\d\d&#x27;</span>)</span><br><span class="line">member.findall(<span class="string">&#x27;Cell: 415-555-9999 Work: 212-555-0000&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">#[&#x27;415-555-9999&#x27;, &#x27;212-555-0000&#x27;]</span></span><br></pre></td></tr></table></figure>
+<p><code>finditer</code></p>
+<p>匹配字符串中所有内容，返回一个迭代器（Match对象组），用for循环一个一个提出出来后.group( )</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">it = member.finditer(<span class="string">r&quot; &quot;</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> it:</span><br><span class="line">    <span class="built_in">print</span>(i.group())</span><br></pre></td></tr></table></figure>
+<p><code>sub()</code></p>
+<p>找到匹配的字符串并用第一个参数替换</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">name = re.<span class="built_in">compile</span>(<span class="string">&#x27;Agent\s\w+&#x27;</span>)</span><br><span class="line">mo = name.sub(<span class="string">&#x27;CENSORED&#x27;</span>, <span class="string">&#x27;Agent Alice gave the secret documents to Agent Bob.&#x27;</span>)</span><br><span class="line"><span class="built_in">print</span>(mo)</span><br><span class="line"><span class="comment">#CENSORED gave the secret documents to CENSORED.</span></span><br></pre></td></tr></table></figure>
+<p>从正则匹配出的字符串中提取需要内容：</p>
+<p><code>group()</code>和<code>groups()</code></p>
+<p>当使用括号分隔正则表达式时，<code>group()</code>可以指定返回第几部分，<code>groups()</code>返回一个元组</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">phoneNumRegex = re.<span class="built_in">compile</span>(<span class="string">r&#x27;(\d\d\d)-(\d\d\d-\d\d\d\d)&#x27;</span>)</span><br><span class="line">mo = phoneNumRegex.search(<span class="string">&#x27;My number is 415-555-4242.&#x27;</span>)</span><br><span class="line">mo.group(<span class="number">1</span>) <span class="comment">#&#x27;415&#x27;</span></span><br><span class="line">mo.group(<span class="number">2</span>) <span class="comment">#&#x27;555-4242&#x27;</span></span><br><span class="line">mo.group(<span class="number">0</span>) <span class="comment">#&#x27;415-555-4242&#x27;</span></span><br><span class="line">mo.group()  <span class="comment">#&#x27;415-555-4242&#x27;</span></span><br></pre></td></tr></table></figure>
+<p>  或者，我们可以给每一部分的匹配内容命名，设定一个组别，然后把组名传入给<code>.group(&quot;name&quot;)</code>来提取数据。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#格式：    (?P&lt;组名&gt;正则式子)</span></span><br><span class="line"><span class="comment">#打印：    print(mo.group(&quot;组名&quot;))</span></span><br></pre></td></tr></table></figure>
+<p>举个例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">string = <span class="string">&quot;&lt;div class=&#x27;西游记&#x27;&gt;&lt;span id=&#x27;10010&#x27;&gt;中国联通&lt;/span&gt;&lt;/div&gt;&quot;</span></span><br><span class="line"></span><br><span class="line">obj= re.<span class="built_in">compile</span>(<span class="string">r&quot;&lt;span id=&#x27;(?P&lt;id&gt;\d+)&#x27;&gt;(?P&lt;name&gt;\w+)&lt;/span&gt;&quot;</span>, re.S)</span><br><span class="line"></span><br><span class="line">result = obj.search(s)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(result.group()) 			<span class="comment">#结果:&lt;span id=&#x27;10010&#x27;&gt;中国联通&lt;/span&gt;</span></span><br><span class="line"><span class="built_in">print</span>(result.group(<span class="string">&quot;id&quot;</span>)) 		<span class="comment"># 结果:10010 # 获取id组的内容</span></span><br><span class="line"><span class="built_in">print</span>(result.group(<span class="string">&#x27;name&quot;)) 	# 结果:中国联通 # 获取name组的内容</span></span><br></pre></td></tr></table></figure>
+<h3 id="python读写JSON数据"><a href="#python读写JSON数据" class="headerlink" title="python读写JSON数据"></a>python读写JSON数据</h3><p>读（load）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">data = json.load(load_f)</span><br></pre></td></tr></table></figure>
+<p>写（dump）:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">json.dump(data, dump_f)</span><br></pre></td></tr></table></figure>
+<p>总结如图：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>json.dumps()</code></td>
+<td>将python对象编码成<code>json</code>字符串</td>
+</tr>
+<tr>
+<td><code>json.loads()</code></td>
+<td>将<code>json</code>字符串解码成python对象</td>
+</tr>
+<tr>
+<td><code>json.dump()</code></td>
+<td>将python中的对象转化成<code>json</code>储存到文件中</td>
+</tr>
+<tr>
+<td><code>json.load()</code></td>
+<td>将文件中的<code>json</code>的格式转化成python对象提取出来</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="提取HTML内嵌的子页面（超链接）"><a href="#提取HTML内嵌的子页面（超链接）" class="headerlink" title="提取HTML内嵌的子页面（超链接）"></a>提取HTML内嵌的子页面（超链接）</h3><p>当我们用正则爬取内嵌在html代码里的数据时，有时候要提取出子页面的URL，这些URL一般被放在超链接中，和一串文字相呼应，在html中超链接的格式是这样的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;a href = &#x27;URL&#x27; title = &quot;浮动标题&quot;&gt;一串文字&lt;/a&gt;</span><br></pre></td></tr></table></figure>
+<p>用a标签来表示超链接。</p>
+<h2 id="bs4解析"><a href="#bs4解析" class="headerlink" title="bs4解析"></a>bs4解析</h2><h3 id="html标记语言"><a href="#html标记语言" class="headerlink" title="html标记语言"></a>html标记语言</h3><p>html作为一种超文本标记语言，大体上有以下两种标签格式：</p>
+<p>两端闭合</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">标签</span> <span class="attr">属性</span> = <span class="string">”属性值“</span>&gt;</span>被标记的内容<span class="tag">&lt;/<span class="name">标签</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p> 自带闭合</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">标签</span> /&gt;</span></span><br></pre></td></tr></table></figure>
+<h3 id="用Beautiful-Soup解析数据"><a href="#用Beautiful-Soup解析数据" class="headerlink" title="用Beautiful Soup解析数据"></a>用Beautiful Soup解析数据</h3><p>安装bs4模块</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install bs4</span><br></pre></td></tr></table></figure>
+<p>把页面源代码交给Beautiful Soup进行处理，生成bs对象</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">page = BeautifulSoup(resp.text, <span class="string">&quot;html.parser&quot;</span>) <span class="comment">#指定为html解析器</span></span><br></pre></td></tr></table></figure>
+<p>从bs对象中查找数据</p>
+<p><code>find(标签, 属性 = 值)</code></p>
+<p><code>find_all(标签, 属性 = 值)</code></p>
+<p>关键字冲突问题：</p>
+<p>当html的属性和python语法的关键字冲突时，可能会出现语法错误，例如：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">table = page.find(<span class="string">&quot;table&quot;</span>, <span class="keyword">class</span> = <span class="string">&quot;hq_table&quot;</span>) <span class="comment">#calss是python的关键字</span></span><br><span class="line"><span class="comment">#上述代码必定报错，class冲突了，可以用下划线解决歧义</span></span><br><span class="line">table = page.find(<span class="string">&quot;table&quot;</span>, class_ = <span class="string">&quot;hq_table&quot;</span>)</span><br><span class="line"><span class="comment">#或者用字典的方式传入属性-值对 </span></span><br><span class="line">table = page.find(<span class="string">&quot;table&quot;</span>, attrs = &#123;<span class="string">&quot;class&quot;</span> : <span class="string">&quot;hq_table&quot;</span>&#125;)</span><br></pre></td></tr></table></figure>
+<p>通过find和find_all函数，我们可以嵌套寻找标签内的内容，比如先找到A标签的内容，然后再在A标签里面找到B标签的内容，最后通过<code>.text</code>函数拿到<strong>被标签标记的内容</strong></p>
+<p>当我们想要A标签里的属性值时，我们可以用get函数获取：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">member = A.get(<span class="string">&#x27;属性&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="X-path解析"><a href="#X-path解析" class="headerlink" title="X path解析"></a>X path解析</h2><h3 id="安装模块和基础解析"><a href="#安装模块和基础解析" class="headerlink" title="安装模块和基础解析"></a>安装模块和基础解析</h3><p>x path是在XML文档中搜索内容的一门语言，兼容html（html是xml的一个子集）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install lxml</span><br></pre></td></tr></table></figure>
+<p>使用x path模块：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">form xpath <span class="keyword">import</span> etree</span><br><span class="line"></span><br><span class="line">xml = <span class="string">&quot;&quot;&quot;...&quot;&quot;&quot;</span> <span class="comment">#内容</span></span><br><span class="line"></span><br><span class="line">tree = etree.XML(xml)  <span class="comment">#生成一个对象</span></span><br><span class="line">tree = etree.parse(<span class="string">&quot;A.html&quot;</span>) <span class="comment">#解析文件并生成一个对象</span></span><br><span class="line">tree = etree.HTML(resp.text) <span class="comment">#解析HTML源码并生成一个对象</span></span><br><span class="line"></span><br><span class="line">result = tree.xpath()  <span class="comment">#使用xpath功能</span></span><br></pre></td></tr></table></figure>
+<p>在x path解析里，用层级嵌套来寻找内容。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">xml = <span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">		&lt;book&gt;</span></span><br><span class="line"><span class="string">        	&lt;name&gt;名字&lt;/name&gt;</span></span><br><span class="line"><span class="string">        	&lt;nick&gt;东西1&lt;/nick&gt;</span></span><br><span class="line"><span class="string">        	&lt;author&gt;</span></span><br><span class="line"><span class="string">        		&lt;nick, id = &quot;1&quot;&gt;周&lt;/nick&gt;</span></span><br><span class="line"><span class="string">        		&lt;nick, id = &quot;2&quot;&gt;陶&lt;/nick&gt;</span></span><br><span class="line"><span class="string">        		&lt;nick, id = &quot;3&quot;&gt;王&lt;/nick&gt;</span></span><br><span class="line"><span class="string">        		&lt;div&gt;</span></span><br><span class="line"><span class="string">        			&lt;nick, id = &quot;4&quot;&gt;林&lt;/nick&gt;</span></span><br><span class="line"><span class="string">     			&lt;/div&gt;</span></span><br><span class="line"><span class="string">     			&lt;span&gt;</span></span><br><span class="line"><span class="string">     				&lt;nick, id = &quot;5&quot;&gt;刘&lt;/nick&gt;</span></span><br><span class="line"><span class="string">        		&lt;/span&gt;</span></span><br><span class="line"><span class="string">        	author&gt;</span></span><br><span class="line"><span class="string">	  &quot;&quot;&quot;</span></span><br><span class="line">result = tree.xpath(<span class="string">&quot;/book&quot;</span>)  <span class="comment">#/表示层级关系，第一个/是根节点</span></span><br><span class="line"><span class="comment">#一个迭代器指向book</span></span><br><span class="line">result = tree.xpath(<span class="string">&quot;/book/name/text()&quot;</span>)  <span class="comment">#text()拿文本</span></span><br><span class="line"><span class="comment">#[&#x27;名字&#x27;]</span></span><br><span class="line">result = tree.xpath(<span class="string">&quot;/book//nick/text()&quot;</span>)  <span class="comment">#//表示后代，之间有任意路径</span></span><br><span class="line"><span class="comment">#[&#x27;东西1&#x27;，&#x27;周&#x27;,&#x27;陶&#x27;,&#x27;王&#x27;,&#x27;林&#x27;,&#x27;刘&#x27;]</span></span><br><span class="line">result = tree.xpath(<span class="string">&quot;/book/author/*/nick/text()&quot;</span>)   <span class="comment"># *是通配符，代表任意节点</span></span><br><span class="line"><span class="comment">#[&#x27;林&#x27;,&#x27;刘&#x27;]</span></span><br></pre></td></tr></table></figure>
+<p>由上述例子：</p>
+<p><code>text()</code>，用该函数提取文本</p>
+<p><code>/</code>代表层级关系</p>
+<p><code>*</code>代表通配符，能代表任意节点</p>
+<p><code>//</code>代表任意后代，即任意层节点</p>
+<h3 id="节点索引"><a href="#节点索引" class="headerlink" title="节点索引"></a>节点索引</h3><figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span> = <span class="string">&quot; &quot;</span>&gt;</span>one<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span> = <span class="string">&quot; &quot;</span>&gt;</span>two<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span> = <span class="string">&quot; &quot;</span>&gt;</span>three<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span> = <span class="string">&quot;one&quot;</span>&gt;</span>小<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span> = <span class="string">&quot;two&quot;</span>&gt;</span>叶<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">li</span>&gt;</span><span class="tag">&lt;<span class="name">a</span> <span class="attr">href</span> = <span class="string">&quot;three&quot;</span>&gt;</span>子<span class="tag">&lt;/<span class="name">a</span>&gt;</span><span class="tag">&lt;/<span class="name">li</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span>    </span><br></pre></td></tr></table></figure>
+<p>对于上述的html，当我们想提取其中<code>&lt;li&gt;</code>标签下的内容时，会一次性提取三个，我们可以用索引来只提取某个。<strong>注意：索引从1开始</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tree = etree.parse(<span class="string">&quot;A.html&quot;</span>)</span><br><span class="line">result = tree.xpath(<span class="string">&quot;/body/li[1]/a/text()&quot;</span>)</span><br><span class="line"><span class="comment">#[&#x27;one&#x27;]</span></span><br></pre></td></tr></table></figure>
+<p>而当我们想提取某个固定属性值的节点的内容，比如上述例子中的<code>href</code>为one的节点时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">result = tree.xpath(<span class="string">&quot;/body/li[@href = &quot;</span>one<span class="string">&quot;]/a/text()&quot;</span>)</span><br><span class="line"><span class="comment">#[&#x27;小&#x27;]</span></span><br></pre></td></tr></table></figure>
+<p>用符号<code>@</code>加上属性 = 属性值，来索引特定的内容。</p>
+<p><code>@</code>符号用来代表属性，使用<code>@属性</code>来拿到属性值</p>
+<p><code>.</code>句点号在x path解析里代表当前节点，在相对查找时，一般用<code>./</code>加相对路径。</p>
+<p>由此，通过循环提取出<code>href</code>内容：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">li_list = tree.xpath(<span class="string">&quot;/body/li&quot;</span>) <span class="comment">#先查找到所用li节点</span></span><br><span class="line"><span class="keyword">for</span> li <span class="keyword">in</span> li_list:</span><br><span class="line">    <span class="built_in">print</span>(li.xpath(<span class="string">&quot;./a/@href&quot;</span>)) <span class="comment">#通过相对查找提取出a中的href</span></span><br><span class="line">	<span class="comment">#[&#x27;one&#x27;]</span></span><br><span class="line">    <span class="comment">#[&#x27;two&#x27;]</span></span><br><span class="line">    <span class="comment">#[&#x27;three&#x27;]</span></span><br></pre></td></tr></table></figure>
+<p> 注：通过检查元素能快速复制x path，右键 -&gt; copy -&gt; copy x path</p>
+<h2 id="requests进阶"><a href="#requests进阶" class="headerlink" title="requests进阶"></a>requests进阶</h2><h3 id="处理cookie-登录网站"><a href="#处理cookie-登录网站" class="headerlink" title="处理cookie 登录网站"></a>处理cookie 登录网站</h3><p>有些网址的数据必须要在登录后才会出现马，想要爬取这些数据，我们就要模拟登录的过程。</p>
+<p>登录的过程实际上是从服务器得到一串cookie，之后客户端带着cookie去请求服务器时，服务器就会发送对应cookie的数据到客户端，简化后就是：</p>
+<p>1、登录 -&gt; 得到cookie</p>
+<p>2、带着cookie -&gt; 请求内容</p>
+<p>使用session进行请求，使得第一个请求到第二个请求之间的cookie不会丢失。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#生成一个会话对象</span></span><br><span class="line">session = requests.session()</span><br><span class="line"><span class="comment">#登录</span></span><br><span class="line">url_login = <span class="string">&quot;//login&quot;</span></span><br><span class="line">url_for_data = <span class="string">&quot; &quot;</span></span><br><span class="line">data = &#123;用户名和密码&#125;</span><br><span class="line">session.post(url, data = data)</span><br><span class="line">resp = session.get(url_for_data)  <span class="comment">#两个操作在同一个会话对象上进行！！！</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>除了会话，在network里直接抓包请求头里的cookie，然后用字典的方式传入headers，同样实现了一样的效果，实际上会话操作也是带着有cookie的请求头去请求到data的。</p>
+<h3 id="防盗链Referer"><a href="#防盗链Referer" class="headerlink" title="防盗链Referer"></a>防盗链<code>Referer</code></h3><p>防盗链：回溯本次请求的上一级请求是什么</p>
+<p>防盗链是为了防止URL的不正常访问顺序存在的，例如URL2中存在防盗链URL1，那么当我们访问URL2时，就会对它进行一个溯源，若发现URL2的访问不源自于URL1，那么就会报错。</p>
+<p>应对这个问题，简单的只需要将<code>Referer</code>的信息传入headers里就好了。</p>
+<h3 id="代理"><a href="#代理" class="headerlink" title="代理"></a>代理</h3><p> 代理：通过第三方的IP去发送请求</p>
+<h2 id="提高爬虫效率"><a href="#提高爬虫效率" class="headerlink" title="提高爬虫效率"></a>提高爬虫效率</h2><h3 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h3><p>第一种写法：</p>
+<p>导入多线程的线程类：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">form threading <span class="keyword">import</span> Thread</span><br></pre></td></tr></table></figure>
+<p>之后就可以开始编写自己的线程子类了。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Mythread</span>(<span class="title class_ inherited__">Thread</span>):</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">run</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">&quot;hello!&quot;</span>)</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    t = Mythread()</span><br><span class="line">    t.start()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;world!&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>继承线程类后，改写run函数，将里面改写成要执行的内容。然后start函数提示线程开始工作（只是提醒可以开始工作了，具体工作时间由CPU决定）</p>
+<p>在main函数创建一个线程对象，然后和main函数里的print一起工作：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">world!</span><br><span class="line">world!hello!</span><br><span class="line">hello!</span><br><span class="line">world!</span><br><span class="line">hello!</span><br><span class="line"></span><br><span class="line">world!hello!</span><br><span class="line">hello!</span><br></pre></td></tr></table></figure>
+<p>就会出现这种异步的打印结果，说明多线程成功实现了。</p>
+<p>第二种写法：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">func</span>():</span><br><span class="line">	...</span><br><span class="line">t = Thread(target = func) <span class="comment">#创建线程并给线程安排任务</span></span><br></pre></td></tr></table></figure>
+<h3 id="多进程"><a href="#多进程" class="headerlink" title="多进程"></a>多进程</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">from multiprocessing import process</span><br></pre></td></tr></table></figure>
+<p>python里的写法和多线程基本一致。</p>
+<h3 id="线程池（和进程池）"><a href="#线程池（和进程池）" class="headerlink" title="线程池（和进程池）"></a>线程池（和进程池）</h3><p>线程池：一次性开辟一些线程，直接给线程池提交任务，线程任务的调度交给线程池来完成。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> concurrent.futures <span class="keyword">import</span> ThreadPoolExecutor, ProcessPoolExecutor</span><br></pre></td></tr></table></figure>
+<p>开辟一个线程池：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">def</span> <span class="title function_">func</span>(<span class="params">name</span>):</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">    	<span class="built_in">print</span>(name)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    <span class="keyword">with</span> ThreadPoolExecutor(<span class="number">50</span>) <span class="keyword">as</span> t:</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">            t.submit(func, name = <span class="string">f&quot;线程<span class="subst">&#123;i&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Over!!&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>这里创建了一个50个线程的线程池，提交<code>func</code>任务，由线程池来进行调度，部分结果如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">线程98</span><br><span class="line">线程97线程94</span><br><span class="line">线程90</span><br><span class="line"></span><br><span class="line">线程98</span><br><span class="line">线程97线程94</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">线程94</span><br></pre></td></tr></table></figure>
+<h3 id="协程"><a href="#协程" class="headerlink" title="协程"></a>协程</h3><p>协程：当程序遇见了IO操作之类的阻塞时，可以选择性的切换到其他任务上。</p>
+<p>在单线程的情况下，实现多任务异步操作，进行任务之间的切换实现CPU的无缝工作。</p>
+<h3 id="python实现多任务异步"><a href="#python实现多任务异步" class="headerlink" title="python实现多任务异步"></a>python实现多任务异步</h3><p>带有<code>async</code>关键字的函数是一个协程函数，协程对象可以实现多任务异步操作。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> asyncio</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">fun1</span>():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">2</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;hello&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">fun2</span>():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;world&quot;</span>)</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">3</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;world&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">fun3</span>():</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;!!&quot;</span>)</span><br><span class="line">    <span class="keyword">await</span> asyncio.sleep(<span class="number">4</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;!!&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    tasks = [fun1(), fun2(), fun3()]</span><br><span class="line">    <span class="keyword">await</span> asyncio.wait(tasks)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    t1 = time.time()</span><br><span class="line">    asyncio.run(main())</span><br><span class="line">    t2 = time.time()</span><br><span class="line">    <span class="built_in">print</span>(t2 - t1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#输出结果大约为4秒钟，在异步条件下由最长的睡眠4秒决定程序运行时间，说明程序是并发运行。</span></span><br></pre></td></tr></table></figure>
+<p><code>asyncio.run()</code>：运行协程函数。（一般用来运行最高层级的入口点 “main()” 函数）</p>
+<p><code>await</code>：用于挂起阻塞的异步调用接口，一般放在协程对象前面</p>
+<p><code>asyncio.wait()</code>：并发地运行传入的可迭代对象，比如我们传入一个协程函数列表</p>
+<h3 id="新版python异步协程方法wait的改动"><a href="#新版python异步协程方法wait的改动" class="headerlink" title="新版python异步协程方法wait的改动"></a>新版python异步协程方法wait的改动</h3><p>python3.8后，协程对象要手动包装成task对象，方法如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">tasks = [</span><br><span class="line">	asyncio.create_task(fun1()),</span><br><span class="line">	asyncio.create_task(fun2()),</span><br><span class="line">	asyncio.create_task(fun3())</span><br><span class="line">]    </span><br></pre></td></tr></table></figure>
+<p>在上述例子中，要将协程对象fun1封装，然后再放到task列表里。</p>
+<h3 id="aiohttp模块实现异步请求"><a href="#aiohttp模块实现异步请求" class="headerlink" title="aiohttp模块实现异步请求"></a><code>aiohttp</code>模块实现异步请求</h3><p>在之前的程序中，<code>request.get()</code>是同步操作的请求，要实现异步操作的请求，就要用到<code>aiohttp</code>模块。</p>
+<p>创建一个<code>aiohttp.ClientSession()</code>对象，相当于requests模块的requests对象。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">async</span> <span class="keyword">def</span> <span class="title function_">aiodownload</span>(<span class="params">url</span>):</span><br><span class="line">    name = <span class="string">&quot;yours&quot;</span></span><br><span class="line">    <span class="keyword">async</span> <span class="keyword">with</span> aiohttp.ClientSession() <span class="keyword">as</span> session:  <span class="comment">#创建一个异步对象session</span></span><br><span class="line">        <span class="keyword">async</span> <span class="keyword">with</span> session.get(url) <span class="keyword">as</span> resp:   <span class="comment">#相当于resp = session.get(url)</span></span><br><span class="line">            <span class="comment">#等待请求后，写入到一个文件</span></span><br><span class="line">            <span class="keyword">with</span> <span class="built_in">open</span>(name, mode = <span class="string">&quot;wb&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">                f.write(<span class="keyword">await</span> resp.content.read())  <span class="comment">#读取内容是异步的，需要await挂起</span></span><br></pre></td></tr></table></figure>
+<p>这个是一个大致的模板，然后将这个异步函数传入URL放到tasks列表里，用<code>asyncio.wait()</code>启动，再用<code>asyncio.run()</code>运行就大功告成了。</p>
+<h2 id="Selenium"><a href="#Selenium" class="headerlink" title="Selenium"></a>Selenium</h2><p>selenium是一款自动化测试工具，可以打开浏览器然后像人一样去操作浏览器，程序员因此可以直接从selenium中直接提取网页数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install selenium</span><br></pre></td></tr></table></figure>
+<p>然后需要安装浏览器驱动，我的浏览器用的是Edge，所以直接去Edge官网下载浏览器驱动。</p>
+<p><a target="_blank" rel="noopener" href="https://developer.microsoft.com/zh-cn/microsoft-edge/tools/webdriver/?form=MA13LH">下载地址</a></p>
+<p>下载完后，将压缩包解压到python解释器所在的文件夹。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium.webdriver <span class="keyword">import</span> Edge</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">web = Edge()</span><br><span class="line"></span><br><span class="line">web.get(<span class="string">&quot;http://www.baidu.com&quot;</span>)</span><br><span class="line">time.sleep(<span class="number">10</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>用这个代码测试一下，如果能正常打开浏览器然后进入百度就说明可以使用了，不过这时候窗口顶部，会出现一行提示受自动化工具控制的字样，这个字样会影响我们爬取资源，之后再解决。</p>
+<h3 id="用xpath提取数据"><a href="#用xpath提取数据" class="headerlink" title="用xpath提取数据"></a>用<code>xpath</code>提取数据</h3><p> selenium工具一般使用<code>xpath</code>来寻找各种元素：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">web = Edge()</span><br><span class="line">web.find_element_by_xpath(&quot; &quot;)</span><br></pre></td></tr></table></figure>
+<p>导入键盘模块可以模拟键盘输入：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium.webdriver.common.keys <span class="keyword">import</span> Keys</span><br><span class="line">web.find_element_by_xpath(<span class="string">&quot;搜索框的xpath&quot;</span>).send_keys(<span class="string">&quot;input&quot;</span>, Keys.ENTER)</span><br><span class="line"><span class="comment">#输入后回车</span></span><br></pre></td></tr></table></figure>
+<h3 id="窗口切换"><a href="#窗口切换" class="headerlink" title="窗口切换"></a>窗口切换</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#selenium中不会主动切换窗口，需要我们手动切换</span></span><br><span class="line"><span class="comment">#这里代表切换到窗口排列顺序中最后一个窗口的位置</span></span><br><span class="line">web.switch_to.window(web.windows_handles[-<span class="number">1</span>])</span><br><span class="line"><span class="comment">#在新窗口中提取内容</span></span><br><span class="line">content = web.find_element_by_xpath(<span class="string">&quot;&quot;</span>).text</span><br><span class="line"><span class="comment">#关闭窗口</span></span><br><span class="line">web.close()</span><br></pre></td></tr></table></figure>
+<h3 id="下拉列表select"><a href="#下拉列表select" class="headerlink" title="下拉列表select"></a>下拉列表select</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium.webdriver.support.select <span class="keyword">import</span> Select</span><br><span class="line"><span class="comment">#定位到下拉列表</span></span><br><span class="line">sel_el = web.find_element_by_xpath(<span class="string">&quot;&quot;</span>)</span><br><span class="line"><span class="comment">#对元素进行包装，包装成下拉菜单</span></span><br><span class="line">sel = Select(sel_el)</span><br><span class="line"><span class="comment">#让浏览器进行调整选项</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(sel.options)):</span><br><span class="line">    <span class="comment">#按照索引进行切换</span></span><br><span class="line">    sel.select_by_index (i)</span><br><span class="line"> 	</span><br></pre></td></tr></table></figure>
+<p>除了根据索引切换，还能根据value值和文本text进行切换，如<code>select_by_visible_text()</code>和<code>select_by_value</code>。</p>
+<h3 id="配置无头不显示浏览器"><a href="#配置无头不显示浏览器" class="headerlink" title="配置无头不显示浏览器"></a>配置无头不显示浏览器</h3><p>我们正常在使用selenium的时候会打开一个浏览器窗口，配置一下浏览器能够使窗口不显示。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> selenium.webdriver.edge.options <span class="keyword">import</span> Options</span><br><span class="line">opt = Options()</span><br><span class="line">opt.add_argument(<span class="string">&quot;--headless&quot;</span>)</span><br><span class="line">opt.add_argument(<span class="string">&quot;--disable&quot;</span>)</span><br><span class="line">web = Edge(options = opt)</span><br></pre></td></tr></table></figure>
+<h3 id="拿到页面Elements"><a href="#拿到页面Elements" class="headerlink" title="拿到页面Elements"></a>拿到页面Elements</h3><p>Elements是经过数据加载以及<code>js</code>等执行后，产生的html内容（大部分时不是页面源代码）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">print</span>(web.page_source)</span><br></pre></td></tr></table></figure>
+<h3 id="验证码"><a href="#验证码" class="headerlink" title="验证码"></a>验证码</h3></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://www.beihaihaihai.top">BE1ha1</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://www.beihaihaihai.top/2024/10/04/%E7%88%AC%E8%99%AB/">https://www.beihaihaihai.top/2024/10/04/%E7%88%AC%E8%99%AB/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://www.beihaihaihai.top" target="_blank">北海の小站</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%9F%BA%E7%A1%80/">基础</a><a class="post-meta__tags" href="/tags/%E7%88%AC%E8%99%AB/">爬虫</a></div><div class="post_share"><div class="social-share" data-image="https://my-own-pic-bed.pages.dev/img/28.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.3/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2024/10/04/%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D/" title="正则匹配"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/66.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">正则匹配</div></div></a></div><div class="next-post pull-right"><a href="/2024/07/16/git/" title="git的基础使用"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/11.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">git的基础使用</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2024/04/21/%E7%94%A8%E7%88%AC%E8%99%AB%E7%88%AC%E5%8F%96%E8%94%9A%E8%93%9D%E6%A1%A3%E6%A1%88wiki%E7%9A%84%E8%AE%B0%E5%BF%86%E5%A4%A7%E5%8E%85/" title="用爬虫爬取图片后搭建随机图床"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/0.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-21</div><div class="title">用爬虫爬取图片后搭建随机图床</div></div></a></div><div><a href="/2024/04/12/GDB%E8%B0%83%E8%AF%95%E5%91%BD%E4%BB%A4/" title="GDB调试命令"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/yihua1.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-12</div><div class="title">GDB调试命令</div></div></a></div><div><a href="/2024/01/30/C-%E7%BB%A7%E6%89%BF/" title="C++继承"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/xiang3.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-01-30</div><div class="title">C++继承</div></div></a></div><div><a href="/2024/05/27/IDA%E9%87%8C%E7%9A%84%E5%AE%8F/" title="IDA里反编译后出现的宏"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/56.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-27</div><div class="title">IDA里反编译后出现的宏</div></div></a></div><div><a href="/2024/04/25/LC-3-%E6%B1%87%E7%BC%96%E8%AF%AD%E8%A8%80%E5%AE%9E%E9%AA%8C1%E6%B1%82%E6%88%90%E7%BB%A9%E7%AD%89%E7%BA%A7/" title="LC-3 汇编语言实验1求成绩等级"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://my-own-pic-bed.pages.dev/img/28.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-04-25</div><div class="title">LC-3 汇编语言实验1求成绩等级</div></div></a></div><div><a href="/2024/05/01/DontEatMe/" title="【buuctf】DontEatMe"><img class="cover" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/rlj.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2024-05-01</div><div class="title">【buuctf】DontEatMe</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/xiang.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">BE1ha1</div><div class="author-info__description">这里是幻想乡~</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">50</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">27</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">5</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/beihaihaihai"><i class="fab fa-github"></i><span>由此进入幻想乡</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/beihaihaihai" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:283829027@qq.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">弓马齐射洒热血，突破重围显英豪！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#web%E8%AF%B7%E6%B1%82%E8%BF%87%E7%A8%8B%E5%89%96%E6%9E%90"><span class="toc-text">web请求过程剖析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E6%B8%B2%E6%9F%93"><span class="toc-text">服务器渲染</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%A2%E6%88%B7%E7%AB%AF%E6%B8%B2%E6%9F%93"><span class="toc-text">客户端渲染</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#HTTP%E5%8D%8F%E8%AE%AE"><span class="toc-text">HTTP协议</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Requests"><span class="toc-text">Requests</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A%E5%AD%97%E7%AC%A6%E9%9B%86"><span class="toc-text">指定字符集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9A%E7%99%BE%E5%BA%A6%E6%90%9C%E7%B4%A2%E6%A1%86%E6%90%9C%E7%B4%A2"><span class="toc-text">案例：百度搜索框搜索</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9A%E7%99%BE%E5%BA%A6%E7%BF%BB%E8%AF%91%E5%8D%95%E8%AF%8D"><span class="toc-text">案例：百度翻译单词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A1%88%E4%BE%8B%EF%BC%9A%E8%B1%86%E7%93%A3%E7%94%B5%E5%BD%B1%E6%8E%92%E8%A1%8C%E6%A6%9C"><span class="toc-text">案例：豆瓣电影排行榜</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8DRe%E6%A8%A1%E5%9D%97"><span class="toc-text">正则匹配Re模块</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A3%E5%88%99%E5%BA%93re"><span class="toc-text">正则库re</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%85%B3%E6%AD%A3%E5%88%99%E7%9A%84python%E6%96%B9%E6%B3%95"><span class="toc-text">有关正则的python方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python%E8%AF%BB%E5%86%99JSON%E6%95%B0%E6%8D%AE"><span class="toc-text">python读写JSON数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%90%E5%8F%96HTML%E5%86%85%E5%B5%8C%E7%9A%84%E5%AD%90%E9%A1%B5%E9%9D%A2%EF%BC%88%E8%B6%85%E9%93%BE%E6%8E%A5%EF%BC%89"><span class="toc-text">提取HTML内嵌的子页面（超链接）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bs4%E8%A7%A3%E6%9E%90"><span class="toc-text">bs4解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#html%E6%A0%87%E8%AE%B0%E8%AF%AD%E8%A8%80"><span class="toc-text">html标记语言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8Beautiful-Soup%E8%A7%A3%E6%9E%90%E6%95%B0%E6%8D%AE"><span class="toc-text">用Beautiful Soup解析数据</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#X-path%E8%A7%A3%E6%9E%90"><span class="toc-text">X path解析</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E6%A8%A1%E5%9D%97%E5%92%8C%E5%9F%BA%E7%A1%80%E8%A7%A3%E6%9E%90"><span class="toc-text">安装模块和基础解析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8A%82%E7%82%B9%E7%B4%A2%E5%BC%95"><span class="toc-text">节点索引</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#requests%E8%BF%9B%E9%98%B6"><span class="toc-text">requests进阶</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%84%E7%90%86cookie-%E7%99%BB%E5%BD%95%E7%BD%91%E7%AB%99"><span class="toc-text">处理cookie 登录网站</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%B2%E7%9B%97%E9%93%BEReferer"><span class="toc-text">防盗链Referer</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%A3%E7%90%86"><span class="toc-text">代理</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8F%90%E9%AB%98%E7%88%AC%E8%99%AB%E6%95%88%E7%8E%87"><span class="toc-text">提高爬虫效率</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E7%BA%BF%E7%A8%8B"><span class="toc-text">多线程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%9A%E8%BF%9B%E7%A8%8B"><span class="toc-text">多进程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%EF%BC%88%E5%92%8C%E8%BF%9B%E7%A8%8B%E6%B1%A0%EF%BC%89"><span class="toc-text">线程池（和进程池）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E7%A8%8B"><span class="toc-text">协程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#python%E5%AE%9E%E7%8E%B0%E5%A4%9A%E4%BB%BB%E5%8A%A1%E5%BC%82%E6%AD%A5"><span class="toc-text">python实现多任务异步</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%96%B0%E7%89%88python%E5%BC%82%E6%AD%A5%E5%8D%8F%E7%A8%8B%E6%96%B9%E6%B3%95wait%E7%9A%84%E6%94%B9%E5%8A%A8"><span class="toc-text">新版python异步协程方法wait的改动</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#aiohttp%E6%A8%A1%E5%9D%97%E5%AE%9E%E7%8E%B0%E5%BC%82%E6%AD%A5%E8%AF%B7%E6%B1%82"><span class="toc-text">aiohttp模块实现异步请求</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Selenium"><span class="toc-text">Selenium</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%A8xpath%E6%8F%90%E5%8F%96%E6%95%B0%E6%8D%AE"><span class="toc-text">用xpath提取数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AA%97%E5%8F%A3%E5%88%87%E6%8D%A2"><span class="toc-text">窗口切换</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%8B%E6%8B%89%E5%88%97%E8%A1%A8select"><span class="toc-text">下拉列表select</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E6%97%A0%E5%A4%B4%E4%B8%8D%E6%98%BE%E7%A4%BA%E6%B5%8F%E8%A7%88%E5%99%A8"><span class="toc-text">配置无头不显示浏览器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%BF%E5%88%B0%E9%A1%B5%E9%9D%A2Elements"><span class="toc-text">拿到页面Elements</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AA%8C%E8%AF%81%E7%A0%81"><span class="toc-text">验证码</span></a></li></ol></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2024 By BE1ha1</div><div class="footer_custom_text">May all the beauty be blessed</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="简繁转换">繁</button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=4.12.0"></script><script src="/js/main.js?v=4.12.0"></script><script src="/js/tw_cn.js?v=4.12.0"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0.32/dist/fancybox/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@5.2.0/instantpage.min.js" type="module"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@17.8.5/dist/lazyload.iife.min.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar@0.1.16/dist/snackbar.min.js"></script><script>function panguFn () {
+  if (typeof pangu === 'object') pangu.autoSpacingPage()
+  else {
+    getScript('https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js')
+      .then(() => {
+        pangu.autoSpacingPage()
+      })
+  }
+}
+
+function panguInit () {
+  if (false){
+    GLOBAL_CONFIG_SITE.isPost && panguFn()
+  } else {
+    panguFn()
+  }
+}
+
+document.addEventListener('DOMContentLoaded', panguInit)</script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script></div><canvas id="universe"></canvas><script defer src="/js/universe.js"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=4.12.0"></script></div></div><!-- hexo injector body_end start --><script data-pjax>
+    function butterfly_categories_card_injector_config(){
+      var parent_div_git = document.getElementById('recent-posts');
+      var item_html = '<style>li.categoryBar-list-item{width:32.3%;}.categoryBar-list{max-height: 380px;overflow:auto;}.categoryBar-list::-webkit-scrollbar{width:0!important}@media screen and (max-width: 650px){.categoryBar-list{max-height: 320px;}}</style><div class="recent-post-item" style="height:auto;width:100%;padding:0px;"><div id="categoryBar"><ul class="categoryBar-list"><li class="categoryBar-list-item" style="background:url(/img/xiang2.png);"> <a class="categoryBar-list-link" href="categories/C/">C++</a><span class="categoryBar-list-count">9</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/ao3.png);"> <a class="categoryBar-list-link" href="categories/Re-wp/">Re-wp</a><span class="categoryBar-list-count">9</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/umi11.png);"> <a class="categoryBar-list-link" href="categories/刷题/">刷题</a><span class="categoryBar-list-count">4</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/yuanshen1.jpg);"> <a class="categoryBar-list-link" href="categories/数据结构/">数据结构</a><span class="categoryBar-list-count">3</span><span class="categoryBar-list-descr"></span></li><li class="categoryBar-list-item" style="background:url(/img/arti1.jpg);"> <a class="categoryBar-list-link" href="categories/math/">math</a><span class="categoryBar-list-count">1</span><span class="categoryBar-list-descr"></span></li></ul></div></div>';
+      console.log('已挂载butterfly_categories_card')
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+      }
+    if( document.getElementById('recent-posts') && (location.pathname ==='/'|| '/' ==='all')){
+    butterfly_categories_card_injector_config()
+    }
+  </script><script data-pjax>
+  function butterfly_clock_anzhiyu_injector_config(){
+    var parent_div_git = document.getElementsByClassName('sticky_layout')[0];
+    var item_html = '<div class="card-widget card-clock"><div class="card-glass"><div class="card-background"><div class="card-content"><div id="hexo_electric_clock"><img class="entered loading" id="card-clock-loading" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/loading.gif" style="height: 120px; width: 100%;" data-ll-status="loading"/></div></div></div></div></div>';
+    console.log('已挂载butterfly_clock_anzhiyu')
+    if(parent_div_git) {
+      parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = '/';
+  var qweather_key = 'b16a1fa0e63c46a4b8f28abfb06ae3fe';
+  var gaud_map_key = 'e2b04289e870b005374ee030148d64fd&s=rsv3';
+  var baidu_ak_key = 'undefined';
+  var flag = 0;
+  var clock_rectangle = '113.34532,23.15624';
+  var clock_default_rectangle_enable = 'false';
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_clock_anzhiyu_injector_config();
+  }
+  </script><script src="https://widget.qweather.net/simple/static/js/he-simple-common.js?v=2.0"></script><script data-pjax src="https://cdn.cbd.int/hexo-butterfly-clock-anzhiyu/lib/clock.min.js"></script><script data-pjax>
+  function butterfly_swiper_injector_config(){
+    var parent_div_git = document.getElementById('recent-posts');
+    var item_html = '<div class="recent-post-item" style="height: auto;width: 100%"><div class="blog-slider swiper-container-fade swiper-container-horizontal" id="swiper_container"><div class="blog-slider__wrp swiper-wrapper" style="transition-duration: 0ms;"><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/02/06/beingCTF-WP/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/rinai2.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-02-06</span><a class="blog-slider__title" href="2024/02/06/beingCTF-WP/" alt="">beginCTF</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/02/06/beingCTF-WP/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/02/14/hagme-week2/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/yihua1.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-02-14</span><a class="blog-slider__title" href="2024/02/14/hagme-week2/" alt="">hgame_wp</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/02/14/hagme-week2/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/02/19/VNCTF的签到题/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/mali1.png" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-02-19</span><a class="blog-slider__title" href="2024/02/19/VNCTF的签到题/" alt="">VNCTF2024</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/02/19/VNCTF的签到题/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/01/29/GeekChallenge/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/liya.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-01-29</span><a class="blog-slider__title" href="2024/01/29/GeekChallenge/" alt="">GeekChallenge 2023 re wp</a><div class="blog-slider__text">一篇逆向wp</div><a class="blog-slider__button" href="2024/01/29/GeekChallenge/" alt="">详情   </a></div></div><div class="blog-slider__item swiper-slide" style="width: 750px; opacity: 1; transform: translate3d(0px, 0px, 0px); transition-duration: 0ms;"><a class="blog-slider__img" href="2024/01/29/nbctf/" alt=""><img width="48" height="48" src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/yuanshen2.jpg" alt="" onerror="this.src=https://unpkg.zhimg.com/akilar-candyassets/image/loading.gif; this.onerror = null;"/></a><div class="blog-slider__content"><span class="blog-slider__code">2024-01-29</span><a class="blog-slider__title" href="2024/01/29/nbctf/" alt="">nbctf</a><div class="blog-slider__text">又一篇逆向wp</div><a class="blog-slider__button" href="2024/01/29/nbctf/" alt="">详情   </a></div></div></div><div class="blog-slider__pagination swiper-pagination-clickable swiper-pagination-bullets"></div></div></div>';
+    console.log('已挂载butterfly_swiper')
+    parent_div_git.insertAdjacentHTML("afterbegin",item_html)
+    }
+  var elist = 'undefined'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_swiper_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_swiper_injector_config();
+  }
+  </script><script defer src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper.min.js"></script><script defer data-pjax src="https://npm.elemecdn.com/hexo-butterfly-swiper/lib/swiper_init.js"></script><script data-pjax>
+  function butterfly_footer_beautify_injector_config(){
+    var parent_div_git = document.getElementById('footer-wrap');
+    var item_html = '<div id="workboard"></div><p id="ghbdages"><a class="github-badge" target="_blank" href="https://hexo.io/" style="margin-inline:5px" data-title="博客框架为Hexo_v6.2.0" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Frame-Hexo-blue?style=flat&amp;logo=hexo" alt=""/></a><a class="github-badge" target="_blank" href="https://butterfly.js.org/" style="margin-inline:5px" data-title="主题版本Butterfly_v4.3.1" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Theme-Butterfly-6513df?style=flat&amp;logo=bitdefender" alt=""/></a><a class="github-badge" target="_blank" href="https://vercel.com/" style="margin-inline:5px" data-title="本站采用多线部署，主线路托管于Vercel" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-Vercel-brightgreen?style=flat&amp;logo=Vercel" alt=""/></a><a class="github-badge" target="_blank" href="https://dashboard.4everland.org/" style="margin-inline:5px" data-title="本站采用多线部署，备用线路托管于4EVERLAND" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Hosted-4EVERLAND-22DDDD?style=flat&amp;logo=IPFS" alt=""/></a><a class="github-badge" target="_blank" href="https://github.com/" style="margin-inline:5px" data-title="本站项目由Github托管" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Source-Github-d021d6?style=flat&amp;logo=GitHub" alt=""/></a><a class="github-badge" target="_blank" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" style="margin-inline:5px" data-title="本站采用知识共享署名-非商业性使用-相同方式共享4.0国际许可协议进行许可" title=""><img src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="https://img.shields.io/badge/Copyright-BY--NC--SA%204.0-d42328?style=flat&amp;logo=Claris" alt=""/></a></p>';
+    console.log('已挂载butterfly_footer_beautify')
+    parent_div_git.insertAdjacentHTML("beforeend",item_html)
+    }
+  var elist = 'null'.split(',');
+  var cpage = location.pathname;
+  var epage = 'all';
+  var flag = 0;
+
+  for (var i=0;i<elist.length;i++){
+    if (cpage.includes(elist[i])){
+      flag++;
+    }
+  }
+
+  if ((epage ==='all')&&(flag == 0)){
+    butterfly_footer_beautify_injector_config();
+  }
+  else if (epage === cpage){
+    butterfly_footer_beautify_injector_config();
+  }
+  </script><script async src="/js/runtime.js"></script><!-- hexo injector body_end end --><script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"debug":false,"model":{"jsonPath":"/live2dw/assets/koharu.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":false},"log":false});</script></body></html>
