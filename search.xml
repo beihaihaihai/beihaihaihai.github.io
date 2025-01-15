@@ -42,25 +42,6 @@
     
     
     <entry>
-      <title>巅峰极客2024-babyre</title>
-      <link href="/2024/10/04/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22024re-wp/"/>
-      <url>/2024/10/04/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22024re-wp/</url>
-      
-        <content type="html"><![CDATA[<h2 id="0x01-babyre"><a href="#0x01-babyre" class="headerlink" title="0x01 babyre"></a>0x01 babyre</h2><h3 id="分析程序"><a href="#分析程序" class="headerlink" title="分析程序"></a>分析程序</h3><p>输入的字符串经过3个3个的分解，例如flag分解为<code>fla</code>和<code>lag</code>，然后每组字符串经过sha256，再和原来未加密的字符串轮异或，例如，字符串<code>fla</code>经过sha256后生成的32字节的哈希值，每个字节和<code>fla</code>轮异或，得到的新的32字节的值。</p><p>源程序中有1280字节的密文，也就是40个上述的加密后的哈希值，分组爆破出3个3个的flag块，经过首尾相接后组成flag。</p><p>源程序中的40个加密后的哈希值经过随机打乱，不再是<code>fla</code>，<code>lag</code>…，的排列顺序，所以把flag块爆破出来后还需要一个脚本来拼接flag。</p><h3 id="python脚本"><a href="#python脚本" class="headerlink" title="python脚本"></a>python脚本</h3><p>爆破flag块</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 输入的字符串经过3个3个的分解，然后每组字符串经过sha256，再和原来未加密的字符串轮异或</span></span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line">enc_list = [<span class="string">&#x27;EB74464F7924C56210CBFFC5A239BE0399ED2C8FB9542BA7C58A7E560F352CA0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;3EE5E00A6EA938CF85F882C799D78BC682225428F4E556D047F15E5766855C04&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;660DC72181954CF9976E5705CBAA483D2AAB5A69283D68E4F74C23CFA8C226D0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;F941E7F4FF9960F1DA677E9DBF9814B5B3E2D799074AC0120F212F3A52C37FE3&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;35D56DB4BD214600049F7F950C01FABD8625065607304F17AEF3C0F0177F9B3E&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;BDE5663346606CB307F1645F006DB088F34F7D44BE9543A1393B29506D1D3181&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;4460FE7BAC48BDBB8E354128E7535CE73B1618C594D9D1B9BF7148A7D77077E9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;A7FFA0BE1CFA9800FE3364F9E7304557974045E0C950B8F3444432C16AB7DDEE&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;371F6026FA2D6FC143598A9EE9E12736EABD515BAE24BB03E4C062DDC263F4A1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;8C3E5C10A4CC88E19B04592B864AC883D8B994EEB2C46496B3416B000C9A344A&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;4F3CF2C30DA6DD57B7D3701CDCB9418EAE8A0470C2AD2668ECF0E3AE6B6A29F6&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;AE3C23E30F42571DFC507171D173F928718E2A5D18C43F7A5B20E125A6421EFB&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;EFA5034BF44B5E66EF90124EE2CFFD9AACE7C49356A64ADFFBA0D44D29B125AB&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;8E98386ED91129B0197AE9A642C173578EFD4784D1EE087CE765A714640F9AA8&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;67A4AD879229F1712037D522B5226B2DC7440EFCB753EC8A52C29CF1FB9BD85F&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;A65FDA70B1261E143F9406D00D90AA0F55310652F3F908D7C1E5A841F77EBD30&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;14FCA23CB223F8915D7730AFC7276F1C0FC7EA33A3083553D2684D964EC7E4A9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;205DEE6FCFEADA8B589CF48326AF2DEBF56DB42A4DFDF74BF9CB0A34BFD97B90&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;B83E17E31FE0A48B54C94AC4175B46302D5E8B38D7CB42E618AEC9197D43B1B3&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;6891A18CDC5CA57F20284187FE6988D860ED46076F779B088D2FA78A798A55DC&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;C6E657E8B101A23B9F8ADE02F696D905F63C626C3E07FD06002B2030B20FAFF0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;2625D9B875A4B74DD421CCB5411CC309EBE7CC75BED408F9F486E6CFFF4F14AC&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;36DFFB643C2721A3AD4CA95415D59CF3C3EE85FF75F2BC6FFD1FC09499544B72&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;18F5937E8B73C7764DEBC840266B14F3D049AE9511AB135CC764C5C6F10C87C0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;87BC8D3181D7470630D4A983FE401F46C99F4A52D81E8D4146211BFA28AE52C9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;D0E3974AFB2D830F443136F4464DDFEFA30688BE27A8A0158A85B8040C2C0459&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;8F2111751D296F862FFEBC2FB50D6530FE6C09D70F54664ED2F2C44365D647B3&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;E6D5BB45707C8B18C8A248B153309605B34ED9CEF42172114F52AE47E8063131&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;EFB2F1AD55868D648722111B00CFE2132463F9659AA1F8298ED2FBD1239071DC&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;3ACF63661C77A5ACBB54410FF3F7CFA1701040BD2D2C8F721A37E310A8460584&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;5E7202DB021B2346A1BB920AE80DD0066F05A0524BC80339ED9932542883473F&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;EFCA18C1C8B8C9B0E31B7169BAC1F1B9697B2799BDB869006C16C49B77525AB7&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;546FE3345E5F01A5E248FB966B7592D2A0DA0BED3E27F6C789647FDE73F59258&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;FFC6A638758661126FC03D24226DA7295EBDF50C52D96631B5804D02CDF2DC89&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;FA6063CA2D00953200BED4BF734CEDBA0C56A185C46CB60ABCDD8C611E4203B4&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;E0F217FA14389FB1A49C03180CC616C730FA48B1B96EB17D7B3BDFD9B6A7D646&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;A57C976DD592A3F022A15399A1C37140E1897B231918DC2F2257DD2CC33FADEF&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;99939CE9EB676674458ED487984E9F8D2C7DF23D8093940FEAB586D0E674B6B2&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;416125DED9C2386A247F1D87BAD1CAB640579EAE3050FFD0A8AEDF52254AA5E9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;186F060C97150EC26626CC8451C47569764B281667A54428E096A20A5D81EB4D&#x27;</span>]</span><br><span class="line"></span><br><span class="line">enc0 = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 爆！！！！</span></span><br><span class="line"><span class="comment"># sha256每组有32个字节</span></span><br><span class="line"><span class="keyword">for</span> m <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">40</span>):</span><br><span class="line">    f = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">33</span>, <span class="number">127</span>):</span><br><span class="line">        <span class="keyword">if</span> f:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">33</span>, <span class="number">127</span>):</span><br><span class="line">            <span class="keyword">if</span> f:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">33</span>, <span class="number">127</span>):</span><br><span class="line">                enc1 = [i, j, k]</span><br><span class="line">                enc0 = <span class="built_in">chr</span>(i) + <span class="built_in">chr</span>(j) + <span class="built_in">chr</span>(k)</span><br><span class="line">                hash_data = hashlib.sha256(enc0.encode(<span class="string">&#x27;utf-8&#x27;</span>)).hexdigest()</span><br><span class="line">                temp = <span class="string">&quot;&quot;</span></span><br><span class="line">                <span class="keyword">for</span> h <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>):</span><br><span class="line">                    hex_data = enc1[h % <span class="number">3</span>] ^ <span class="built_in">int</span>(hash_data[(<span class="number">2</span> * h): (<span class="number">2</span> * h + <span class="number">2</span>)], <span class="number">16</span>)</span><br><span class="line">                    <span class="keyword">if</span> hex_data &lt;= <span class="number">0xf</span>:</span><br><span class="line">                        temp += <span class="string">&#x27;0&#x27;</span></span><br><span class="line">                    temp += <span class="built_in">hex</span>(hex_data)[<span class="number">2</span>:].upper()</span><br><span class="line">                <span class="keyword">if</span> temp == enc_list[m]:</span><br><span class="line">                    f = <span class="literal">True</span></span><br><span class="line">                    <span class="built_in">print</span>(<span class="string">&quot;\&#x27;&quot;</span> + enc0 + <span class="string">&quot;\&#x27;&quot;</span>, end=<span class="string">&quot;, &quot;</span>)</span><br><span class="line">                    <span class="keyword">break</span></span><br></pre></td></tr></table></figure><p>拼接flag</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># flag是上个脚本的输出</span></span><br><span class="line">flag = [<span class="string">&quot;-48&quot;</span>, <span class="string">&quot;-79&quot;</span>,<span class="string">&quot;-80&quot;</span>,<span class="string">&quot;-bf&quot;</span>,<span class="string">&quot;0bd&quot;</span>,<span class="string">&quot;177&quot;</span>,<span class="string">&quot;194&quot;</span>,<span class="string">&quot;29f&quot;</span>,</span><br><span class="line">    <span class="string">&quot;37-&quot;</span>,<span class="string">&quot;39a&quot;</span>,<span class="string">&quot;4-7&quot;</span>,<span class="string">&quot;48f&quot;</span>,<span class="string">&quot;4a3&quot;</span>,<span class="string">&quot;7-4&quot;</span>,<span class="string">&quot;729&quot;</span>,</span><br><span class="line">    <span class="string">&quot;772&quot;</span>,<span class="string">&quot;793&quot;</span>,<span class="string">&quot;80b&quot;</span>,<span class="string">&quot;8a&#125;&quot;</span>,<span class="string">&quot;8fb&quot;</span>,<span class="string">&#x27;937&#x27;</span>,<span class="string">&quot;94a&quot;</span>,<span class="string">&quot;9a4&quot;</span>,<span class="string">&quot;9f8&quot;</span>,<span class="string">&quot;a-8&quot;</span>,</span><br><span class="line">    <span class="string">&quot;a39&quot;</span>,<span class="string">&quot;a4-&quot;</span>,<span class="string">&quot;ag&#123;&quot;</span>,<span class="string">&quot;b-b&quot;</span>,<span class="string">&quot;bd1&quot;</span>,<span class="string">&quot;bfe&quot;</span>,<span class="string">&quot;d17&quot;</span>,<span class="string">&quot;ea-&quot;</span>,</span><br><span class="line">    <span class="string">&quot;f8a&quot;</span>,<span class="string">&quot;fb-&quot;</span>,<span class="string">&quot;fea&quot;</span>,<span class="string">&quot;fla&quot;</span>,<span class="string">&quot;g&#123;1&quot;</span>,<span class="string">&quot;lag&quot;</span>,<span class="string">&quot;&#123;19&quot;</span>]</span><br><span class="line"><span class="built_in">input</span> = <span class="string">&quot;fla&quot;</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">for</span> one <span class="keyword">in</span> flag:</span><br><span class="line">        <span class="keyword">if</span> one[:<span class="number">2</span>] == <span class="built_in">input</span>[-<span class="number">2</span>:]:</span><br><span class="line">            <span class="built_in">input</span> += one[-<span class="number">1</span>:]</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">input</span>[-<span class="number">1</span>:] == <span class="string">&#x27;&#125;&#x27;</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">input</span>)</span><br><span class="line"><span class="comment">#flag&#123;194a39a4-7937-48fb-bfea-80bd17729f8a&#125;</span></span><br></pre></td></tr></table></figure>]]></content>
-      
-      
-      
-        <tags>
-            
-            <tag> re </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>正则匹配</title>
       <link href="/2024/10/04/%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D/"/>
       <url>/2024/10/04/%E6%AD%A3%E5%88%99%E5%8C%B9%E9%85%8D/</url>
@@ -72,6 +53,25 @@
         <tags>
             
             <tag> 正则 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>巅峰极客2024-babyre</title>
+      <link href="/2024/10/04/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22024re-wp/"/>
+      <url>/2024/10/04/%E5%B7%85%E5%B3%B0%E6%9E%81%E5%AE%A22024re-wp/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-babyre"><a href="#0x01-babyre" class="headerlink" title="0x01 babyre"></a>0x01 babyre</h2><h3 id="分析程序"><a href="#分析程序" class="headerlink" title="分析程序"></a>分析程序</h3><p>输入的字符串经过3个3个的分解，例如flag分解为<code>fla</code>和<code>lag</code>，然后每组字符串经过sha256，再和原来未加密的字符串轮异或，例如，字符串<code>fla</code>经过sha256后生成的32字节的哈希值，每个字节和<code>fla</code>轮异或，得到的新的32字节的值。</p><p>源程序中有1280字节的密文，也就是40个上述的加密后的哈希值，分组爆破出3个3个的flag块，经过首尾相接后组成flag。</p><p>源程序中的40个加密后的哈希值经过随机打乱，不再是<code>fla</code>，<code>lag</code>…，的排列顺序，所以把flag块爆破出来后还需要一个脚本来拼接flag。</p><h3 id="python脚本"><a href="#python脚本" class="headerlink" title="python脚本"></a>python脚本</h3><p>爆破flag块</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 输入的字符串经过3个3个的分解，然后每组字符串经过sha256，再和原来未加密的字符串轮异或</span></span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line">enc_list = [<span class="string">&#x27;EB74464F7924C56210CBFFC5A239BE0399ED2C8FB9542BA7C58A7E560F352CA0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;3EE5E00A6EA938CF85F882C799D78BC682225428F4E556D047F15E5766855C04&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;660DC72181954CF9976E5705CBAA483D2AAB5A69283D68E4F74C23CFA8C226D0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;F941E7F4FF9960F1DA677E9DBF9814B5B3E2D799074AC0120F212F3A52C37FE3&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;35D56DB4BD214600049F7F950C01FABD8625065607304F17AEF3C0F0177F9B3E&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;BDE5663346606CB307F1645F006DB088F34F7D44BE9543A1393B29506D1D3181&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;4460FE7BAC48BDBB8E354128E7535CE73B1618C594D9D1B9BF7148A7D77077E9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;A7FFA0BE1CFA9800FE3364F9E7304557974045E0C950B8F3444432C16AB7DDEE&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;371F6026FA2D6FC143598A9EE9E12736EABD515BAE24BB03E4C062DDC263F4A1&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;8C3E5C10A4CC88E19B04592B864AC883D8B994EEB2C46496B3416B000C9A344A&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;4F3CF2C30DA6DD57B7D3701CDCB9418EAE8A0470C2AD2668ECF0E3AE6B6A29F6&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;AE3C23E30F42571DFC507171D173F928718E2A5D18C43F7A5B20E125A6421EFB&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;EFA5034BF44B5E66EF90124EE2CFFD9AACE7C49356A64ADFFBA0D44D29B125AB&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;8E98386ED91129B0197AE9A642C173578EFD4784D1EE087CE765A714640F9AA8&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;67A4AD879229F1712037D522B5226B2DC7440EFCB753EC8A52C29CF1FB9BD85F&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;A65FDA70B1261E143F9406D00D90AA0F55310652F3F908D7C1E5A841F77EBD30&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;14FCA23CB223F8915D7730AFC7276F1C0FC7EA33A3083553D2684D964EC7E4A9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;205DEE6FCFEADA8B589CF48326AF2DEBF56DB42A4DFDF74BF9CB0A34BFD97B90&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;B83E17E31FE0A48B54C94AC4175B46302D5E8B38D7CB42E618AEC9197D43B1B3&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;6891A18CDC5CA57F20284187FE6988D860ED46076F779B088D2FA78A798A55DC&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;C6E657E8B101A23B9F8ADE02F696D905F63C626C3E07FD06002B2030B20FAFF0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;2625D9B875A4B74DD421CCB5411CC309EBE7CC75BED408F9F486E6CFFF4F14AC&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;36DFFB643C2721A3AD4CA95415D59CF3C3EE85FF75F2BC6FFD1FC09499544B72&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;18F5937E8B73C7764DEBC840266B14F3D049AE9511AB135CC764C5C6F10C87C0&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;87BC8D3181D7470630D4A983FE401F46C99F4A52D81E8D4146211BFA28AE52C9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;D0E3974AFB2D830F443136F4464DDFEFA30688BE27A8A0158A85B8040C2C0459&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;8F2111751D296F862FFEBC2FB50D6530FE6C09D70F54664ED2F2C44365D647B3&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;E6D5BB45707C8B18C8A248B153309605B34ED9CEF42172114F52AE47E8063131&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;EFB2F1AD55868D648722111B00CFE2132463F9659AA1F8298ED2FBD1239071DC&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;3ACF63661C77A5ACBB54410FF3F7CFA1701040BD2D2C8F721A37E310A8460584&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;5E7202DB021B2346A1BB920AE80DD0066F05A0524BC80339ED9932542883473F&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;EFCA18C1C8B8C9B0E31B7169BAC1F1B9697B2799BDB869006C16C49B77525AB7&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;546FE3345E5F01A5E248FB966B7592D2A0DA0BED3E27F6C789647FDE73F59258&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;FFC6A638758661126FC03D24226DA7295EBDF50C52D96631B5804D02CDF2DC89&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;FA6063CA2D00953200BED4BF734CEDBA0C56A185C46CB60ABCDD8C611E4203B4&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;E0F217FA14389FB1A49C03180CC616C730FA48B1B96EB17D7B3BDFD9B6A7D646&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;A57C976DD592A3F022A15399A1C37140E1897B231918DC2F2257DD2CC33FADEF&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;99939CE9EB676674458ED487984E9F8D2C7DF23D8093940FEAB586D0E674B6B2&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;416125DED9C2386A247F1D87BAD1CAB640579EAE3050FFD0A8AEDF52254AA5E9&#x27;</span>,</span><br><span class="line">            <span class="string">&#x27;186F060C97150EC26626CC8451C47569764B281667A54428E096A20A5D81EB4D&#x27;</span>]</span><br><span class="line"></span><br><span class="line">enc0 = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 爆！！！！</span></span><br><span class="line"><span class="comment"># sha256每组有32个字节</span></span><br><span class="line"><span class="keyword">for</span> m <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">40</span>):</span><br><span class="line">    f = <span class="literal">False</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">33</span>, <span class="number">127</span>):</span><br><span class="line">        <span class="keyword">if</span> f:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">33</span>, <span class="number">127</span>):</span><br><span class="line">            <span class="keyword">if</span> f:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">            <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">33</span>, <span class="number">127</span>):</span><br><span class="line">                enc1 = [i, j, k]</span><br><span class="line">                enc0 = <span class="built_in">chr</span>(i) + <span class="built_in">chr</span>(j) + <span class="built_in">chr</span>(k)</span><br><span class="line">                hash_data = hashlib.sha256(enc0.encode(<span class="string">&#x27;utf-8&#x27;</span>)).hexdigest()</span><br><span class="line">                temp = <span class="string">&quot;&quot;</span></span><br><span class="line">                <span class="keyword">for</span> h <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>):</span><br><span class="line">                    hex_data = enc1[h % <span class="number">3</span>] ^ <span class="built_in">int</span>(hash_data[(<span class="number">2</span> * h): (<span class="number">2</span> * h + <span class="number">2</span>)], <span class="number">16</span>)</span><br><span class="line">                    <span class="keyword">if</span> hex_data &lt;= <span class="number">0xf</span>:</span><br><span class="line">                        temp += <span class="string">&#x27;0&#x27;</span></span><br><span class="line">                    temp += <span class="built_in">hex</span>(hex_data)[<span class="number">2</span>:].upper()</span><br><span class="line">                <span class="keyword">if</span> temp == enc_list[m]:</span><br><span class="line">                    f = <span class="literal">True</span></span><br><span class="line">                    <span class="built_in">print</span>(<span class="string">&quot;\&#x27;&quot;</span> + enc0 + <span class="string">&quot;\&#x27;&quot;</span>, end=<span class="string">&quot;, &quot;</span>)</span><br><span class="line">                    <span class="keyword">break</span></span><br></pre></td></tr></table></figure><p>拼接flag</p><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># flag是上个脚本的输出</span></span><br><span class="line">flag = [<span class="string">&quot;-48&quot;</span>, <span class="string">&quot;-79&quot;</span>,<span class="string">&quot;-80&quot;</span>,<span class="string">&quot;-bf&quot;</span>,<span class="string">&quot;0bd&quot;</span>,<span class="string">&quot;177&quot;</span>,<span class="string">&quot;194&quot;</span>,<span class="string">&quot;29f&quot;</span>,</span><br><span class="line">    <span class="string">&quot;37-&quot;</span>,<span class="string">&quot;39a&quot;</span>,<span class="string">&quot;4-7&quot;</span>,<span class="string">&quot;48f&quot;</span>,<span class="string">&quot;4a3&quot;</span>,<span class="string">&quot;7-4&quot;</span>,<span class="string">&quot;729&quot;</span>,</span><br><span class="line">    <span class="string">&quot;772&quot;</span>,<span class="string">&quot;793&quot;</span>,<span class="string">&quot;80b&quot;</span>,<span class="string">&quot;8a&#125;&quot;</span>,<span class="string">&quot;8fb&quot;</span>,<span class="string">&#x27;937&#x27;</span>,<span class="string">&quot;94a&quot;</span>,<span class="string">&quot;9a4&quot;</span>,<span class="string">&quot;9f8&quot;</span>,<span class="string">&quot;a-8&quot;</span>,</span><br><span class="line">    <span class="string">&quot;a39&quot;</span>,<span class="string">&quot;a4-&quot;</span>,<span class="string">&quot;ag&#123;&quot;</span>,<span class="string">&quot;b-b&quot;</span>,<span class="string">&quot;bd1&quot;</span>,<span class="string">&quot;bfe&quot;</span>,<span class="string">&quot;d17&quot;</span>,<span class="string">&quot;ea-&quot;</span>,</span><br><span class="line">    <span class="string">&quot;f8a&quot;</span>,<span class="string">&quot;fb-&quot;</span>,<span class="string">&quot;fea&quot;</span>,<span class="string">&quot;fla&quot;</span>,<span class="string">&quot;g&#123;1&quot;</span>,<span class="string">&quot;lag&quot;</span>,<span class="string">&quot;&#123;19&quot;</span>]</span><br><span class="line"><span class="built_in">input</span> = <span class="string">&quot;fla&quot;</span></span><br><span class="line"><span class="keyword">while</span> <span class="literal">True</span>:</span><br><span class="line">    <span class="keyword">for</span> one <span class="keyword">in</span> flag:</span><br><span class="line">        <span class="keyword">if</span> one[:<span class="number">2</span>] == <span class="built_in">input</span>[-<span class="number">2</span>:]:</span><br><span class="line">            <span class="built_in">input</span> += one[-<span class="number">1</span>:]</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">input</span>[-<span class="number">1</span>:] == <span class="string">&#x27;&#125;&#x27;</span>:</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">input</span>)</span><br><span class="line"><span class="comment">#flag&#123;194a39a4-7937-48fb-bfea-80bd17729f8a&#125;</span></span><br></pre></td></tr></table></figure>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> re </tag>
             
         </tags>
       
@@ -276,9 +276,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
             <tag> IDA </tag>
             
@@ -336,9 +336,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -678,9 +678,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
             <tag> cum15-213 </tag>
             
@@ -793,33 +793,6 @@
     
     
     <entry>
-      <title>vector容器基础</title>
-      <link href="/2024/02/24/vector%E5%AE%B9%E5%99%A8/"/>
-      <url>/2024/02/24/vector%E5%AE%B9%E5%99%A8/</url>
-      
-        <content type="html"><![CDATA[<h2 id="0x01-vector构造函数"><a href="#0x01-vector构造函数" class="headerlink" title="0x01 vector构造函数"></a>0x01 vector构造函数</h2><p><img src="/Images/adfb98be36cf58f17c2a79b8087f429.png" alt="adfb98be36cf58f17c2a79b8087f429"></p><p>除了第一种，其他几种基本都是拷贝构造而来的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v</span>(<span class="number">10</span>,<span class="number">100</span>);</span><br><span class="line"><span class="comment">//压入10个100的int数</span></span><br></pre></td></tr></table></figure><p>拷贝构造函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v2</span>(v);</span><br><span class="line"><span class="comment">//拷贝了v的10个100</span></span><br></pre></td></tr></table></figure><h2 id="0x02-vector赋值操作"><a href="#0x02-vector赋值操作" class="headerlink" title="0x02 vector赋值操作"></a>0x02 vector赋值操作</h2><p><img src="/Images/image-20240219145512229.png" alt="image-20240219145512229"></p><p>第一种就是等号运算符重载，直接v1 = v2赋值就好了。</p><h2 id="0x03-vector容量和大小"><a href="#0x03-vector容量和大小" class="headerlink" title="0x03 vector容量和大小"></a>0x03 vector容量和大小</h2><p><img src="/Images/image-20240219153402588.png" alt="image-20240219153402588"></p><p>empty( )，若容量为空则返回true，不为空则返回false。</p><p>capacity( )是返回容器的容量的函数，容器的容量不小于容器中元素的个数（常识）。</p><p>resize函数能调整容器的大小（长度size，并非容量）。</p><p>resize函数若不指定填充的元素elem，则默认填充0。</p><h2 id="0x04-vector插入和删除"><a href="#0x04-vector插入和删除" class="headerlink" title="0x04 vector插入和删除"></a>0x04 vector插入和删除</h2><p><img src="/Images/image-20240219160518544.png" alt="image-20240219160518544"></p><p>这里重点记录一下迭代器修改元素的方法。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//迭代器插入法</span></span><br><span class="line">v1.<span class="built_in">insert</span>(v1.<span class="built_in">begin</span>(),<span class="number">100</span>);</span><br><span class="line"><span class="comment">//在v1.begin()的位置插入100，v1.begin()是指向首元的迭代器</span></span><br></pre></td></tr></table></figure><p>注意const_iterator pos 位置是传入迭代器就好了。</p><h2 id="0x05-vector数据存取"><a href="#0x05-vector数据存取" class="headerlink" title="0x05 vector数据存取"></a>0x05 vector数据存取</h2><p><img src="/Images/image-20240219161554444.png" alt="image-20240219161554444"></p><p>没啥好注意的，一般都用[ ]重载来访问</p><h2 id="0x06-vector互换容器"><a href="#0x06-vector互换容器" class="headerlink" title="0x06 vector互换容器"></a>0x06 vector互换容器</h2><p><img src="/Images/image-20240219161831638.png" alt="image-20240219161831638"></p><p>实现两个容器内元素进行互换。</p><p>巧用swap可以收缩内存空间。</p><p>实际情况：假设你定义了一个容量很大的容器时，若当你不需要使用这么大的容量时，通过resize函数只能改变容器的大小，而容量不会改变，这时候多余的容量就遭到了浪费。</p><p>比如你push_back了10000个数据，容量会给你自动扩展到约13000的数据，这时候你resize(3)，将容器的大小调整至3，这时候容量依然是13000左右。这会造成浪费！！！</p><p>解决方法，匿名函数和swap函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(v).<span class="built_in">swap</span>(v);</span><br></pre></td></tr></table></figure><p>vector<int>(v) 默认构造匿名对象。这里会根据v目前所用的元素个数的大小来初始化匿名对象，在这里的例子里，大小为3。</p><p>然后调用 .swap(v)，v的容量经过swap交换后是 3，大小（size）也是 3，不会造成空间浪费了，匿名对象的容量经过swap后占用很大，但是在这一行执行完后匿名对象会被销毁，就不会造成空间浪费了。</p><p><img src="/Images/image-20240219182013042.png" alt="image-20240219182013042"></p><h2 id="0x07-vector预留空间"><a href="#0x07-vector预留空间" class="headerlink" title="0x07 vector预留空间"></a>0x07 vector预留空间</h2><p><img src="/Images/image-20240219182129095.png" alt="image-20240219182129095"></p><p>预留空间是为了，减少vector在动态扩展容量时的扩展次数。</p><p>vector容器在创建的时候是会先预留较多的空间来应对之后的扩展，比如我push_back了10个数据，编译器会事先将这个vector容器的容量设定成100多（大概的，反正比容器大小，元素个数多）。当你继续扩展这个容器时，可能超过了事先预留好的容量，这时候编译器会将原先的容器内的数据拷贝到一个新的，容量更大的容器中，虽然容器的名字不会变，但是该容器的首地址会发生了改变（因为数据被拷贝存储到了一个新开辟的空间）。</p><p>经过浅显的测试，10000个数据在push_back时大约会发生30次的新开辟存储空间的情况，浪费了时间资源。</p><p>测试代码如下</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; v;</span><br><span class="line"><span class="comment">//统计开辟次数</span></span><br><span class="line"><span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++)&#123;</span><br><span class="line">    v.<span class="built_in">push_back</span>(i);</span><br><span class="line">    <span class="comment">//当每次开辟新空间时，v[0]的地址就会变化，以此为参照统计开辟次数</span></span><br><span class="line">    <span class="keyword">if</span>(p!= &amp;v[<span class="number">0</span>])&#123;</span><br><span class="line">        p = &amp;v[<span class="number">0</span>];</span><br><span class="line">        cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">cout &lt;&lt; cnt;</span><br></pre></td></tr></table></figure><p>所以一开始就先预留出容量，能减少扩展次数。</p>]]></content>
-      
-      
-      <categories>
-          
-          <category> C++ </category>
-          
-      </categories>
-      
-      
-        <tags>
-            
-            <tag> 进阶 </tag>
-            
-            <tag> C++ </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title>线段树转载记录</title>
       <link href="/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/"/>
       <url>/2024/02/24/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%A7%8D%E4%B8%80%E9%A2%97%E6%A0%91/</url>
@@ -843,6 +816,33 @@
             <tag> 算法 </tag>
             
             <tag> 数据结构 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>vector容器基础</title>
+      <link href="/2024/02/24/vector%E5%AE%B9%E5%99%A8/"/>
+      <url>/2024/02/24/vector%E5%AE%B9%E5%99%A8/</url>
+      
+        <content type="html"><![CDATA[<h2 id="0x01-vector构造函数"><a href="#0x01-vector构造函数" class="headerlink" title="0x01 vector构造函数"></a>0x01 vector构造函数</h2><p><img src="/Images/adfb98be36cf58f17c2a79b8087f429.png" alt="adfb98be36cf58f17c2a79b8087f429"></p><p>除了第一种，其他几种基本都是拷贝构造而来的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v</span>(<span class="number">10</span>,<span class="number">100</span>);</span><br><span class="line"><span class="comment">//压入10个100的int数</span></span><br></pre></td></tr></table></figure><p>拷贝构造函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt;<span class="built_in">v2</span>(v);</span><br><span class="line"><span class="comment">//拷贝了v的10个100</span></span><br></pre></td></tr></table></figure><h2 id="0x02-vector赋值操作"><a href="#0x02-vector赋值操作" class="headerlink" title="0x02 vector赋值操作"></a>0x02 vector赋值操作</h2><p><img src="/Images/image-20240219145512229.png" alt="image-20240219145512229"></p><p>第一种就是等号运算符重载，直接v1 = v2赋值就好了。</p><h2 id="0x03-vector容量和大小"><a href="#0x03-vector容量和大小" class="headerlink" title="0x03 vector容量和大小"></a>0x03 vector容量和大小</h2><p><img src="/Images/image-20240219153402588.png" alt="image-20240219153402588"></p><p>empty( )，若容量为空则返回true，不为空则返回false。</p><p>capacity( )是返回容器的容量的函数，容器的容量不小于容器中元素的个数（常识）。</p><p>resize函数能调整容器的大小（长度size，并非容量）。</p><p>resize函数若不指定填充的元素elem，则默认填充0。</p><h2 id="0x04-vector插入和删除"><a href="#0x04-vector插入和删除" class="headerlink" title="0x04 vector插入和删除"></a>0x04 vector插入和删除</h2><p><img src="/Images/image-20240219160518544.png" alt="image-20240219160518544"></p><p>这里重点记录一下迭代器修改元素的方法。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//迭代器插入法</span></span><br><span class="line">v1.<span class="built_in">insert</span>(v1.<span class="built_in">begin</span>(),<span class="number">100</span>);</span><br><span class="line"><span class="comment">//在v1.begin()的位置插入100，v1.begin()是指向首元的迭代器</span></span><br></pre></td></tr></table></figure><p>注意const_iterator pos 位置是传入迭代器就好了。</p><h2 id="0x05-vector数据存取"><a href="#0x05-vector数据存取" class="headerlink" title="0x05 vector数据存取"></a>0x05 vector数据存取</h2><p><img src="/Images/image-20240219161554444.png" alt="image-20240219161554444"></p><p>没啥好注意的，一般都用[ ]重载来访问</p><h2 id="0x06-vector互换容器"><a href="#0x06-vector互换容器" class="headerlink" title="0x06 vector互换容器"></a>0x06 vector互换容器</h2><p><img src="/Images/image-20240219161831638.png" alt="image-20240219161831638"></p><p>实现两个容器内元素进行互换。</p><p>巧用swap可以收缩内存空间。</p><p>实际情况：假设你定义了一个容量很大的容器时，若当你不需要使用这么大的容量时，通过resize函数只能改变容器的大小，而容量不会改变，这时候多余的容量就遭到了浪费。</p><p>比如你push_back了10000个数据，容量会给你自动扩展到约13000的数据，这时候你resize(3)，将容器的大小调整至3，这时候容量依然是13000左右。这会造成浪费！！！</p><p>解决方法，匿名函数和swap函数</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">vector</span>&lt;<span class="type">int</span>&gt;(v).<span class="built_in">swap</span>(v);</span><br></pre></td></tr></table></figure><p>vector<int>(v) 默认构造匿名对象。这里会根据v目前所用的元素个数的大小来初始化匿名对象，在这里的例子里，大小为3。</p><p>然后调用 .swap(v)，v的容量经过swap交换后是 3，大小（size）也是 3，不会造成空间浪费了，匿名对象的容量经过swap后占用很大，但是在这一行执行完后匿名对象会被销毁，就不会造成空间浪费了。</p><p><img src="/Images/image-20240219182013042.png" alt="image-20240219182013042"></p><h2 id="0x07-vector预留空间"><a href="#0x07-vector预留空间" class="headerlink" title="0x07 vector预留空间"></a>0x07 vector预留空间</h2><p><img src="/Images/image-20240219182129095.png" alt="image-20240219182129095"></p><p>预留空间是为了，减少vector在动态扩展容量时的扩展次数。</p><p>vector容器在创建的时候是会先预留较多的空间来应对之后的扩展，比如我push_back了10个数据，编译器会事先将这个vector容器的容量设定成100多（大概的，反正比容器大小，元素个数多）。当你继续扩展这个容器时，可能超过了事先预留好的容量，这时候编译器会将原先的容器内的数据拷贝到一个新的，容量更大的容器中，虽然容器的名字不会变，但是该容器的首地址会发生了改变（因为数据被拷贝存储到了一个新开辟的空间）。</p><p>经过浅显的测试，10000个数据在push_back时大约会发生30次的新开辟存储空间的情况，浪费了时间资源。</p><p>测试代码如下</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="type">int</span>&gt; v;</span><br><span class="line"><span class="comment">//统计开辟次数</span></span><br><span class="line"><span class="type">int</span> cnt = <span class="number">0</span>;</span><br><span class="line"><span class="type">int</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"><span class="keyword">for</span>(<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10000</span>; i++)&#123;</span><br><span class="line">    v.<span class="built_in">push_back</span>(i);</span><br><span class="line">    <span class="comment">//当每次开辟新空间时，v[0]的地址就会变化，以此为参照统计开辟次数</span></span><br><span class="line">    <span class="keyword">if</span>(p!= &amp;v[<span class="number">0</span>])&#123;</span><br><span class="line">        p = &amp;v[<span class="number">0</span>];</span><br><span class="line">        cnt++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">cout &lt;&lt; cnt;</span><br></pre></td></tr></table></figure><p>所以一开始就先预留出容量，能减少扩展次数。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> C++ </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 进阶 </tag>
+            
+            <tag> C++ </tag>
             
         </tags>
       
@@ -925,9 +925,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -979,9 +979,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -1006,9 +1006,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -1114,9 +1114,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -1168,9 +1168,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -1195,9 +1195,9 @@
       
         <tags>
             
-            <tag> 基础 </tag>
-            
             <tag> 逆向 </tag>
+            
+            <tag> 基础 </tag>
             
         </tags>
       
@@ -1236,9 +1236,9 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
+      <title>分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1247,31 +1247,9 @@
     
     
     <entry>
-      <title>游戏</title>
-      <link href="/games/index.html"/>
-      <url>/games/index.html</url>
-      
-        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/js/runtime.js"/>
-      <url>/js/runtime.js</url>
-      
-        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1291,33 +1269,11 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
+      <title>游戏</title>
+      <link href="/games/index.html"/>
+      <url>/games/index.html</url>
       
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>视频</title>
-      <link href="/movies/index.html"/>
-      <url>/movies/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
+        <content type="html"><![CDATA[<h2 id="兰斯8攻略"><a href="#兰斯8攻略" class="headerlink" title="兰斯8攻略"></a>兰斯8攻略</h2><p><a href="https://www.bilibili.com/read/readlist/rl472073">【攻略】兰斯8完美图文攻略（整理版）</a></p>]]></content>
       
     </entry>
     
@@ -1335,11 +1291,55 @@
     
     
     <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/runtime.js"/>
+      <url>/js/runtime.js</url>
+      
+        <content type="html"><![CDATA[setInterval(() => {  let create_time = Math.round(new Date('2024-01-28 00:00:00').getTime() / 1000); //在此行修改建站时间  let timestamp = Math.round((new Date().getTime()) / 1000);  let second = timestamp - create_time;  let time = new Array(0, 0, 0, 0, 0);  var nol = function(h){    return h>9?h:'0'+h;  }  if (second >= 365 * 24 * 3600) {    time[0] = parseInt(second / (365 * 24 * 3600));    second %= 365 * 24 * 3600;  }  if (second >= 24 * 3600) {    time[1] = parseInt(second / (24 * 3600));    second %= 24 * 3600;  }  if (second >= 3600) {    time[2] = nol(parseInt(second / 3600));    second %= 3600;  }  if (second >= 60) {    time[3] = nol(parseInt(second / 60));    second %= 60;  }  if (second > 0) {    time[4] = nol(second);  }  if ((Number(time[2])<22) && (Number(time[2])>7)){    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-营业中-6adea8?style=social&logo=cakephp' title='要买一些新鲜美味的面包吗~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  else{    currentTimeHtml ="<img class='boardsign' src='https://img.shields.io/badge/面包店-打烊了-6adea8?style=social&logo=coffeescript' title='这个点了应该去睡觉啦，熬夜对身体不好哦~'><div id='runtime'>" + time[0] + ' YEAR ' + time[1] + ' DAYS ' + time[2] + ' : ' + time[3] + ' : ' + time[4] + '</div>';  }  document.getElementById("workboard").innerHTML = currentTimeHtml;}, 1000);]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>标签</title>
       <link href="/tags/index.html"/>
       <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
+      
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>DIARY</title>
+      <link href="/movies/index.html"/>
+      <url>/movies/index.html</url>
+      
+        <content type="html"><![CDATA[<h2 id="2025-1-16-1点15分"><a href="#2025-1-16-1点15分" class="headerlink" title="2025-1-16 1点15分"></a>2025-1-16 1点15分</h2><p>今天早上7点多就被闹钟吵醒了，起来吃了个早餐后又睡到12点多，跟着教程试着学了一下Go语言，配了wsl2和一些Go语言的环境，晚上去烨桐家玩还一起吃了沙县，逆天cyt还玩原神，给对象带坏了（乐。</p>]]></content>
       
     </entry>
     
