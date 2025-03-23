@@ -456,9 +456,9 @@
             
             <tag> 基础 </tag>
             
-            <tag> 爬虫 </tag>
-            
             <tag> python </tag>
+            
+            <tag> 爬虫 </tag>
             
             <tag> 图床搭建 </tag>
             
@@ -587,6 +587,25 @@
     
     
     <entry>
+      <title>emplace_back()</title>
+      <link href="/2024/04/09/emplace-back/"/>
+      <url>/2024/04/09/emplace-back/</url>
+      
+        <content type="html"><![CDATA[<h2 id="emplace-back"><a href="#emplace-back" class="headerlink" title="emplace_back( )"></a>emplace_back( )</h2><p>在容器末尾添加一个新元素，它通常使用 placement-new 在容器提供的位置就地构造元素。</p><p>通常要保证操作后的size不大于旧的capacity（end迭代器要重新生成），否则需要重新分配内存，这种情况下所有迭代器和对元素的所有引用都会失效。</p><p>下面代码是从cpp reference抄来的，理解一下怎么运行的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">auto</span>&amp; ref = elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson Mandela&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line">    <span class="built_in">assert</span>(ref.year == <span class="number">1994</span> &amp;&amp; <span class="string">&quot;uses a reference to the created object (C++17)&quot;</span>);</span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin Delano Roosevelt&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line"> </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nContents:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: elections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: reElections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was re-elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>下面的是Output：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">emplace_back:</span><br><span class="line">I am being constructed.</span><br><span class="line"> </span><br><span class="line">push_back:</span><br><span class="line">I am being constructed.</span><br><span class="line">I am being moved.</span><br><span class="line"> </span><br><span class="line">Contents:</span><br><span class="line">Nelson Mandela was elected president of South Africa in 1994.</span><br><span class="line">Franklin Delano Roosevelt was re-elected president of the USA in 1936.</span><br></pre></td></tr></table></figure><h2 id="解析代码"><a href="#解析代码" class="headerlink" title="解析代码"></a>解析代码</h2><h3 id="default"><a href="#default" class="headerlink" title="= default"></a>= default</h3><p><code>President&amp; operator=(const President&amp; other) = default;</code></p><p>这串代码里的<code>= default</code>使得编译器将会提供该函数的默认实现，并且保证这些默认实现不会被删除；构造函数和析构函数将提供默认的空实现。</p><p>作用：</p><p>1、生成默认实现：当一个类没有显式定义构造函数或析构函数时，编译器会自动生成默认的构造函数或析构函数。如果我们在类中使用了default关键字，则可以显式地告诉编译器使用默认的实现。</p><p>2、防止默认实现被删除：在某些情况下，编译器不会生成默认的构造函数或析构函数，例如当类包含了一个用户自定义的构造函数或析构函数时。如果我们想要让编译器生成默认的实现，可以在类定义中使用default关键字来显式声明默认的构造函数或析构函数。（例子里属于这种）</p><h3 id="std-move"><a href="#std-move" class="headerlink" title="std : : move"></a>std : : move</h3><p><code>name(std::move(p_name))</code>这里的p_name作为一个右值，通过std::move绑定左值name，相当于构造函数里给name赋值。</p><h3 id="构造函数President"><a href="#构造函数President" class="headerlink" title="构造函数President"></a>构造函数President</h3><p>这里构造函数有两种手动实现，第一种直接传入三个参数构造，第二种传入类other再构造，通过输出很容易发现，通过emplace_back构造的函数直接通过第一种构造，传入参数，不需要生成类再拷贝。</p><p>通过push_back的输出发现，会先构造President类，再通过第二种构造拷贝构造，需要两步。</p><h3 id="c-11的for"><a href="#c-11的for" class="headerlink" title="c++11的for"></a>c++11的for</h3><p><code>for (President const&amp; president: elections)</code></p><p>先定义一个变量，这里是president，然后从序列elections一个一个取出全部元素循环。（例子里这里只有一个President变量elections，只循环一次，将elections作为president取出）。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这段代码就是让你看透emplace_back和push_back添加元素的本质区别。</p>]]></content>
+      
+      
+      
+        <tags>
+            
+            <tag> 基础 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>栈和寄存器</title>
       <link href="/2024/04/09/%E6%A0%88%E5%92%8C%E5%AF%84%E5%AD%98%E5%99%A8/"/>
       <url>/2024/04/09/%E6%A0%88%E5%92%8C%E5%AF%84%E5%AD%98%E5%99%A8/</url>
@@ -600,25 +619,6 @@
             <tag> 基础 </tag>
             
             <tag> cum15-213 </tag>
-            
-        </tags>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>emplace_back()</title>
-      <link href="/2024/04/09/emplace-back/"/>
-      <url>/2024/04/09/emplace-back/</url>
-      
-        <content type="html"><![CDATA[<h2 id="emplace-back"><a href="#emplace-back" class="headerlink" title="emplace_back( )"></a>emplace_back( )</h2><p>在容器末尾添加一个新元素，它通常使用 placement-new 在容器提供的位置就地构造元素。</p><p>通常要保证操作后的size不大于旧的capacity（end迭代器要重新生成），否则需要重新分配内存，这种情况下所有迭代器和对元素的所有引用都会失效。</p><p>下面代码是从cpp reference抄来的，理解一下怎么运行的。</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;vector&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;cassert&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string&gt;</span></span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">struct</span> <span class="title class_">President</span></span><br><span class="line">&#123;</span><br><span class="line">    std::string name;</span><br><span class="line">    std::string country;</span><br><span class="line">    <span class="type">int</span> year;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(std::string p_name, std::string p_country, <span class="type">int</span> p_year)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(p_name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(p_country)), <span class="built_in">year</span>(p_year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being constructed.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">President</span>(President&amp;&amp; other)</span><br><span class="line">        : <span class="built_in">name</span>(std::<span class="built_in">move</span>(other.name)), <span class="built_in">country</span>(std::<span class="built_in">move</span>(other.country)), <span class="built_in">year</span>(other.year)</span><br><span class="line">    &#123;</span><br><span class="line">        std::cout &lt;&lt; <span class="string">&quot;I am being moved.\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    President&amp; <span class="keyword">operator</span>=(<span class="type">const</span> President&amp; other) = <span class="keyword">default</span>;</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    std::vector&lt;President&gt; elections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;emplace_back:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">auto</span>&amp; ref = elections.<span class="built_in">emplace_back</span>(<span class="string">&quot;Nelson Mandela&quot;</span>, <span class="string">&quot;South Africa&quot;</span>, <span class="number">1994</span>);</span><br><span class="line">    <span class="built_in">assert</span>(ref.year == <span class="number">1994</span> &amp;&amp; <span class="string">&quot;uses a reference to the created object (C++17)&quot;</span>);</span><br><span class="line"> </span><br><span class="line">    std::vector&lt;President&gt; reElections;</span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\npush_back:\n&quot;</span>;</span><br><span class="line">    reElections.<span class="built_in">push_back</span>(<span class="built_in">President</span>(<span class="string">&quot;Franklin Delano Roosevelt&quot;</span>, <span class="string">&quot;the USA&quot;</span>, <span class="number">1936</span>));</span><br><span class="line"> </span><br><span class="line">    std::cout &lt;&lt; <span class="string">&quot;\nContents:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: elections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">for</span> (President <span class="type">const</span>&amp; president: reElections)</span><br><span class="line">        std::cout &lt;&lt; president.name &lt;&lt; <span class="string">&quot; was re-elected president of &quot;</span></span><br><span class="line">                  &lt;&lt; president.country &lt;&lt; <span class="string">&quot; in &quot;</span> &lt;&lt; president.year &lt;&lt; <span class="string">&quot;.\n&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>下面的是Output：</p><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">emplace_back:</span><br><span class="line">I am being constructed.</span><br><span class="line"> </span><br><span class="line">push_back:</span><br><span class="line">I am being constructed.</span><br><span class="line">I am being moved.</span><br><span class="line"> </span><br><span class="line">Contents:</span><br><span class="line">Nelson Mandela was elected president of South Africa in 1994.</span><br><span class="line">Franklin Delano Roosevelt was re-elected president of the USA in 1936.</span><br></pre></td></tr></table></figure><h2 id="解析代码"><a href="#解析代码" class="headerlink" title="解析代码"></a>解析代码</h2><h3 id="default"><a href="#default" class="headerlink" title="= default"></a>= default</h3><p><code>President&amp; operator=(const President&amp; other) = default;</code></p><p>这串代码里的<code>= default</code>使得编译器将会提供该函数的默认实现，并且保证这些默认实现不会被删除；构造函数和析构函数将提供默认的空实现。</p><p>作用：</p><p>1、生成默认实现：当一个类没有显式定义构造函数或析构函数时，编译器会自动生成默认的构造函数或析构函数。如果我们在类中使用了default关键字，则可以显式地告诉编译器使用默认的实现。</p><p>2、防止默认实现被删除：在某些情况下，编译器不会生成默认的构造函数或析构函数，例如当类包含了一个用户自定义的构造函数或析构函数时。如果我们想要让编译器生成默认的实现，可以在类定义中使用default关键字来显式声明默认的构造函数或析构函数。（例子里属于这种）</p><h3 id="std-move"><a href="#std-move" class="headerlink" title="std : : move"></a>std : : move</h3><p><code>name(std::move(p_name))</code>这里的p_name作为一个右值，通过std::move绑定左值name，相当于构造函数里给name赋值。</p><h3 id="构造函数President"><a href="#构造函数President" class="headerlink" title="构造函数President"></a>构造函数President</h3><p>这里构造函数有两种手动实现，第一种直接传入三个参数构造，第二种传入类other再构造，通过输出很容易发现，通过emplace_back构造的函数直接通过第一种构造，传入参数，不需要生成类再拷贝。</p><p>通过push_back的输出发现，会先构造President类，再通过第二种构造拷贝构造，需要两步。</p><h3 id="c-11的for"><a href="#c-11的for" class="headerlink" title="c++11的for"></a>c++11的for</h3><p><code>for (President const&amp; president: elections)</code></p><p>先定义一个变量，这里是president，然后从序列elections一个一个取出全部元素循环。（例子里这里只有一个President变量elections，只循环一次，将elections作为president取出）。</p><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>这段代码就是让你看透emplace_back和push_back添加元素的本质区别。</p>]]></content>
-      
-      
-      
-        <tags>
-            
-            <tag> 基础 </tag>
             
         </tags>
       
@@ -1293,9 +1293,31 @@
     
     
     <entry>
-      <title>分类</title>
-      <link href="/categories/index.html"/>
-      <url>/categories/index.html</url>
+      <title></title>
+      <link href="/css/universe.css"/>
+      <url>/css/universe.css</url>
+      
+        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/css/custom.css"/>
+      <url>/css/custom.css</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>关于</title>
+      <link href="/about/index.html"/>
+      <url>/about/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1315,39 +1337,6 @@
     
     
     <entry>
-      <title>关于</title>
-      <link href="/about/index.html"/>
-      <url>/about/index.html</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/custom.css"/>
-      <url>/css/custom.css</url>
-      
-        <content type="html"><![CDATA[]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title></title>
-      <link href="/css/universe.css"/>
-      <url>/css/universe.css</url>
-      
-        <content type="html"><![CDATA[/*样式页面调节*/:root {  --trans-light: rgba(255, 255, 255, 0.75);  --trans-dark: rgba(25, 25, 25, 0.6);  --border-style: 1px solid rgb(169, 169, 169);  /*blur(5px) saturate(150%)*/  --backdrop-filter: none;}/* 背景宇宙星光  */#universe{    display: block;    position: fixed;    margin: 0;    padding: 0;    border: 0;    outline: 0;    left: 0;    top: 0;    width: 100%;    height: 100%;    pointer-events: none;    /* 这个是调置顶的优先级的，-1在文章页下面，背景上面，个人推荐这种 */    z-index: -1;  }  /* 翻页按钮居中 */#pagination {    width: 100%;    margin: auto;  }    /* 一级菜单居中 */#nav .menus_items {  position: absolute !important;  width: fit-content !important;  left: 50% !important;  transform: translateX(-50%) !important;}/* 子菜单横向展示 */#nav .menus_items .menus_item:hover .menus_item_child {  display: flex !important;}/* 这里的2是代表导航栏的第2个元素，即有子菜单的元素，可以按自己需求修改 */.menus_items .menus_item:nth-child(5) .menus_item_child {  left: -38px;}/* 首页文章卡片 */#recent-posts > .recent-post-item {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 25px;  border: var(--border-style);}/* 首页侧栏卡片 */#aside-content .card-widget {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border-radius: 18px;  border: var(--border-style);}/* 文章页、归档页、普通页面 */div#post,div#page,div#archive {  background: var(--trans-light);  backdrop-filter: var(--backdrop-filter);  border: var(--border-style);  border-radius: 20px;}/* 导航栏 */#page-header.nav-fixed #nav {  background: rgba(255, 255, 255, 0.75);  backdrop-filter: var(--backdrop-filter);}[data-theme="dark"] #page-header.nav-fixed #nav {  background: rgba(0, 0, 0, 0.7) !important;}/* 夜间模式遮罩 */[data-theme="dark"] #recent-posts > .recent-post-item,[data-theme="dark"] #aside-content .card-widget,[data-theme="dark"] div#post,[data-theme="dark"] div#archive,[data-theme="dark"] div#page {  background: var(--trans-dark);}/* 夜间模式页脚页头遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}/* 阅读模式 */.read-mode #aside-content .card-widget {  background: rgba(158, 204, 171, 0.5) !important;}.read-mode div#post {  background: rgba(158, 204, 171, 0.5) !important;}/* 夜间模式下的阅读模式 */[data-theme="dark"] .read-mode #aside-content .card-widget {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}[data-theme="dark"] .read-mode div#post {  background: rgba(25, 25, 25, 0.9) !important;  color: #ffffff;}/* 页脚与头图透明 */#footer {  background: transparent !important;}#page-header {  background: transparent !important;}/* 白天模式遮罩透明 */#footer::before {  background: transparent !important;}#page-header::before {  background: transparent !important;}/* 夜间模式遮罩透明 */[data-theme="dark"] #footer::before {  background: transparent !important;}[data-theme="dark"] #page-header::before {  background: transparent !important;}]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
       <title></title>
       <link href="/js/runtime.js"/>
       <url>/js/runtime.js</url>
@@ -1359,20 +1348,9 @@
     
     
     <entry>
-      <title></title>
-      <link href="/js/universe.js"/>
-      <url>/js/universe.js</url>
-      
-        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
-      
-    </entry>
-    
-    
-    
-    <entry>
-      <title>音乐</title>
-      <link href="/music/index.html"/>
-      <url>/music/index.html</url>
+      <title>分类</title>
+      <link href="/categories/index.html"/>
+      <url>/categories/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1381,9 +1359,9 @@
     
     
     <entry>
-      <title>标签</title>
-      <link href="/tags/index.html"/>
-      <url>/tags/index.html</url>
+      <title>友链</title>
+      <link href="/link/index.html"/>
+      <url>/link/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
@@ -1403,9 +1381,31 @@
     
     
     <entry>
-      <title>友链</title>
-      <link href="/link/index.html"/>
-      <url>/link/index.html</url>
+      <title>音乐</title>
+      <link href="/music/index.html"/>
+      <url>/music/index.html</url>
+      
+        <content type="html"><![CDATA[]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title></title>
+      <link href="/js/universe.js"/>
+      <url>/js/universe.js</url>
+      
+        <content type="html"><![CDATA[function dark() {window.requestAnimationFrame=window.requestAnimationFrame||window.mozRequestAnimationFrame||window.webkitRequestAnimationFrame||window.msRequestAnimationFrame;var n,e,i,h,t=.05,s=document.getElementById("universe"),o=!0,a="180,184,240",r="226,225,142",d="226,225,224",c=[];function f(){n=window.innerWidth,e=window.innerHeight,i=.216*n,s.setAttribute("width",n),s.setAttribute("height",e)}function u(){h.clearRect(0,0,n,e);for(var t=c.length,i=0;i<t;i++){var s=c[i];s.move(),s.fadeIn(),s.fadeOut(),s.draw()}}function y(){this.reset=function(){this.giant=m(3),this.comet=!this.giant&&!o&&m(10),this.x=l(0,n-10),this.y=l(0,e),this.r=l(1.1,2.6),this.dx=l(t,6*t)+(this.comet+1-1)*t*l(50,120)+2*t,this.dy=-l(t,6*t)-(this.comet+1-1)*t*l(50,120),this.fadingOut=null,this.fadingIn=!0,this.opacity=0,this.opacityTresh=l(.2,1-.4*(this.comet+1-1)),this.do=l(5e-4,.002)+.001*(this.comet+1-1)},this.fadeIn=function(){this.fadingIn&&(this.fadingIn=!(this.opacity>this.opacityTresh),this.opacity+=this.do)},this.fadeOut=function(){this.fadingOut&&(this.fadingOut=!(this.opacity<0),this.opacity-=this.do/2,(this.x>n||this.y<0)&&(this.fadingOut=!1,this.reset()))},this.draw=function(){if(h.beginPath(),this.giant)h.fillStyle="rgba("+a+","+this.opacity+")",h.arc(this.x,this.y,2,0,2*Math.PI,!1);else if(this.comet){h.fillStyle="rgba("+d+","+this.opacity+")",h.arc(this.x,this.y,1.5,0,2*Math.PI,!1);for(var t=0;t<30;t++)h.fillStyle="rgba("+d+","+(this.opacity-this.opacity/20*t)+")",h.rect(this.x-this.dx/4*t,this.y-this.dy/4*t-2,2,2),h.fill()}else h.fillStyle="rgba("+r+","+this.opacity+")",h.rect(this.x,this.y,this.r,this.r);h.closePath(),h.fill()},this.move=function(){this.x+=this.dx,this.y+=this.dy,!1===this.fadingOut&&this.reset(),(this.x>n-n/4||this.y<0)&&(this.fadingOut=!0)},setTimeout(function(){o=!1},50)}function m(t){return Math.floor(1e3*Math.random())+1<10*t}function l(t,i){return Math.random()*(i-t)+t}f(),window.addEventListener("resize",f,!1),function(){h=s.getContext("2d");for(var t=0;t<i;t++)c[t]=new y,c[t].reset();u()}(),function t(){document.getElementsByTagName('html')[0].getAttribute('data-theme')=='dark'&&u(),window.requestAnimationFrame(t)}()};dark()]]></content>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>标签</title>
+      <link href="/tags/index.html"/>
+      <url>/tags/index.html</url>
       
         <content type="html"><![CDATA[]]></content>
       
